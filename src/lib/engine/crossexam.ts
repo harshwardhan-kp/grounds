@@ -166,7 +166,7 @@ Return JSON matching this exact structure:
   ]
 }`;
 
-  const response = await completeJson<{ claims?: RawExtractedClaim[] }>({ prompt: prompt, schemaHint: "strict JSON object", maxTokens: 4000 });
+  const response = await completeJson<{ claims?: RawExtractedClaim[] }>({ prompt: prompt, schemaHint: "strict JSON object", maxTokens: 16000 });
   const rawClaims = Array.isArray(response?.claims) ? response.claims : [];
 
   return rawClaims.map((raw, idx) => {
@@ -269,7 +269,7 @@ Return JSON:
           evidenceQuote?: string | null;
           confidence?: number;
           reasoning?: string;
-        }>({ prompt: entailmentPrompt, schemaHint: "strict JSON object", maxTokens: 4000 });
+        }>({ prompt: entailmentPrompt, schemaHint: "strict JSON object", maxTokens: 16000 });
 
         if (check?.stance === "supports" || check?.stance === "contradicts") {
           judgements.push({
@@ -475,7 +475,7 @@ Return JSON:
       outcome?: Corroboration;
       evidenceQuote?: string | null;
       reasoning?: string;
-    }>({ prompt: evalPrompt, schemaHint: "strict JSON object", maxTokens: 4000 });
+    }>({ prompt: evalPrompt, schemaHint: "strict JSON object", maxTokens: 16000 });
 
     return {
       claimId: opts.claim.id,
@@ -545,7 +545,7 @@ Return JSON:
     const res = await completeJson<{
       survivesScrutiny?: boolean;
       critique?: string;
-    }>({ prompt: prompt, schemaHint: "strict JSON object", maxTokens: 4000 });
+    }>({ prompt: prompt, schemaHint: "strict JSON object", maxTokens: 16000 });
 
     return Boolean(res?.survivesScrutiny);
   } catch {

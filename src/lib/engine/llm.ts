@@ -213,7 +213,7 @@ export async function complete(opts: {
     messages: Array<{ role: "user"; content: string }>;
   } = {
     model,
-    max_tokens: opts.maxTokens ?? 4096,
+    max_tokens: opts.maxTokens ?? 12000,
     messages: [{ role: "user", content: opts.prompt }],
   };
 
@@ -223,6 +223,8 @@ export async function complete(opts: {
 
   const maxRetries = 3;
   let lastError: Error | null = null;
+  /** Guards the one-shot budget escalation below so we cannot loop forever. */
+  let truncationRetried = false;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     if (opts.signal?.aborted) {
@@ -263,7 +265,35 @@ export async function complete(opts: {
           `Failed to parse response JSON from LLM: ${jsonErr instanceof Error ? jsonErr.message : String(jsonErr)}`
         );
       }
-      return extractTextContent(data);
+      const text = extractTextContent(data);
+
+      /*
+       * This endpoint fronts a reasoning model that emits redacted_thinking
+       * blocks before any text. If the token budget is exhausted during that
+       * hidden phase, the response is a well-formed message with an EMPTY text
+       * block and stop_reason "max_tokens" — which downstream shows up as
+       * "unexpected end of JSON input" with nothing to look at, one of the more
+       * confusing failures possible. Detect it here and retry once with a much
+       * larger budget rather than surfacing an empty parse error.
+       */
+      const stopReason =
+        typeof data === "object" && data !== null
+          ? (data as Record<string, unknown>).stop_reason
+          : undefined;
+
+      if (stopReason === "max_tokens" && text.trim() === "") {
+        if (!truncationRetried) {
+          truncationRetried = true;
+          requestBody.max_tokens = Math.min(requestBody.max_tokens * 4, 32000);
+          continue;
+        }
+        throw new Error(
+          `LLM produced no text: the token budget was consumed by reasoning before any output. ` +
+            `Retry with a larger maxTokens (last tried ${requestBody.max_tokens}).`
+        );
+      }
+
+      return text;
     }
 
     // Client errors other than 429: Never retry

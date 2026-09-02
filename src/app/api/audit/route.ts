@@ -170,6 +170,17 @@ export async function POST(req: Request): Promise<Response> {
           };
         });
 
+        // Emit the line of questioning itself so the UI can label grid rows with
+        // the real question rather than an opaque id.
+        sendEvent({
+          kind: "probes",
+          probes: probes.map((p) => ({
+            id: p.id,
+            query: p.query,
+            family: p.family,
+          })),
+        });
+
         sendEvent({
           kind: "audit_state",
           auditId,
@@ -235,6 +246,11 @@ export async function POST(req: Request): Promise<Response> {
             collisionSet: [],
           });
 
+          sendEvent({
+            kind: "log",
+            line: `  ${claims.length} claims extracted — cross-examining`,
+          });
+
           const targetFactualClaims = claims
             .filter((c) => c.isAboutTarget && c.type === "factual")
             .slice(0, 3);
@@ -246,6 +262,11 @@ export async function POST(req: Request): Promise<Response> {
               claim,
               references: parsed.references ?? [],
               sourceSearchId: observation.searchId,
+            });
+
+            sendEvent({
+              kind: "log",
+              line: `  ${adjudication.verdict} — ${claim.text.slice(0, 72)}`,
             });
 
             sendEvent({

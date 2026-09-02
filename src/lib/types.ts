@@ -287,6 +287,15 @@ export interface Audit {
 export type PipelineEvent =
   | { kind: "audit_state"; auditId: string; state: AuditState }
   | { kind: "budget"; spent: number; budget: number }
+  /**
+   * The generated line of questioning, emitted once before deposition begins.
+   * Cells are keyed by probe id, so the UI needs this to label its rows with the
+   * actual question rather than a uuid.
+   */
+  | {
+      kind: "probes";
+      probes: { id: string; query: string; family: ProbeFamily }[];
+    }
   | {
       kind: "cell_started";
       probeId: string;

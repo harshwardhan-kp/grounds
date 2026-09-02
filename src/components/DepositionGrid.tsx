@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { VerdictChip } from "@/components/Verdict";
+import { localeLabel } from "@/lib/locales";
 import type { PipelineEvent, Verdict } from "@/lib/types";
 
 type CellStatus = "pending" | "running" | "done" | "suppressed" | "error";
@@ -41,6 +42,7 @@ export function DepositionGrid() {
     new Map()
   );
   const [probes, setProbes] = useState<string[]>([]);
+  const [probeQueries, setProbeQueries] = useState<Map<string, string>>(new Map());
   const [locales, setLocales] = useState<string[]>([]);
   const [budget, setBudget] = useState<{ spent: number; limit: number }>({
     spent: 0,
@@ -221,6 +223,16 @@ export function DepositionGrid() {
                 setError(event.message);
                 break;
 
+              case "probes": {
+                // Row order is fixed here, before any cell arrives, so rows do
+                // not reshuffle as results stream in.
+                setProbes(event.probes.map((pr) => pr.id));
+                setProbeQueries(
+                  new Map(event.probes.map((pr) => [pr.id, pr.query])),
+                );
+                break;
+              }
+
               case "audit_state":
                 break;
             }
@@ -286,39 +298,48 @@ export function DepositionGrid() {
             <div
               className="grid gap-2 w-max"
               style={{
-                gridTemplateColumns: `repeat(${locales.length}, minmax(34px, 34px))`,
+                gridTemplateColumns: `minmax(0, 260px) repeat(${locales.length}, minmax(104px, 1fr))`,
               }}
               role="grid"
               aria-label="Deposition grid"
             >
+              <div />
               {locales.map((localeId) => (
                 <div
                   key={localeId}
-                  className="meta text-xs text-muted text-center truncate px-1"
-                  title={localeId}
+                  className="meta text-center px-1 truncate"
+                  title={localeLabel(localeId)}
                 >
-                  {localeId}
+                  {localeLabel(localeId)}
                 </div>
               ))}
 
-              {probes.map((probeId) =>
-                locales.map((localeId) => {
+              {probes.map((probeId) => (
+                <Fragment key={probeId}>
+                <div
+                  className="pr-3 text-right text-sm text-muted truncate max-w-[280px]"
+                  title={probeQueries.get(probeId) ?? probeId}
+                >
+                  {probeQueries.get(probeId) ?? probeId}
+                </div>
+                {locales.map((localeId) => {
                   const key = `${probeId}::${localeId}`;
                   const status = cellStates.get(key) ?? "pending";
-                  const desc = `Probe: ${probeId}, Locale: ${localeId}, State: ${status}`;
+                  const desc = `${probeQueries.get(probeId) ?? probeId} — ${localeLabel(localeId)} — ${status}`;
                   return (
                     <div
                       key={key}
                       title={desc}
                       aria-label={desc}
                       role="gridcell"
-                      className={`w-[34px] h-[34px] min-w-[34px] min-h-[34px] rounded transition-colors ${getCellBgClass(
+                      className={`h-[38px] w-full rounded border border-rule transition-colors ${getCellBgClass(
                         status
                       )}`}
                     />
                   );
-                })
-              )}
+                })}
+                </Fragment>
+              ))}
             </div>
           ) : (
             <div className="py-8 text-center text-muted border border-rule rounded bg-surface text-sm">

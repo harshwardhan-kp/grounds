@@ -10,6 +10,9 @@
 
 import { createHash, randomUUID } from "node:crypto";
 import { serp, BudgetLedger, mapLimit, type SerpParams } from "@/lib/serpapi/client";
+export { DEFAULT_LOCALES } from "@/lib/locales";
+import { DEFAULT_LOCALES } from "@/lib/locales";
+
 import type {
   Engine,
   Locale,
@@ -35,64 +38,6 @@ import type {
  * Southwest (Austin, Phoenix), Mountain West (Denver), and Pacific Northwest (Seattle)
  * to test whether a generative hallucination is isolated or nationwide.
  */
-export const DEFAULT_LOCALES: Locale[] = [
-  {
-    id: "us-mn-minneapolis",
-    location: "Minneapolis, Minnesota, United States",
-    gl: "us",
-    hl: "en",
-    label: "Minneapolis, MN",
-  },
-  {
-    id: "us-mn-saint-paul",
-    location: "Saint Paul, Minnesota, United States",
-    gl: "us",
-    hl: "en",
-    label: "St. Paul, MN",
-  },
-  {
-    id: "us-il-chicago",
-    location: "Chicago, Illinois, United States",
-    gl: "us",
-    hl: "en",
-    label: "Chicago, IL",
-  },
-  {
-    id: "us-wi-milwaukee",
-    location: "Milwaukee, Wisconsin, United States",
-    gl: "us",
-    hl: "en",
-    label: "Milwaukee, WI",
-  },
-  {
-    id: "us-tx-austin",
-    location: "Austin, Texas, United States",
-    gl: "us",
-    hl: "en",
-    label: "Austin, TX",
-  },
-  {
-    id: "us-co-denver",
-    location: "Denver, Colorado, United States",
-    gl: "us",
-    hl: "en",
-    label: "Denver, CO",
-  },
-  {
-    id: "us-az-phoenix",
-    location: "Phoenix, Arizona, United States",
-    gl: "us",
-    hl: "en",
-    label: "Phoenix, AZ",
-  },
-  {
-    id: "us-wa-seattle",
-    location: "Seattle, Washington, United States",
-    gl: "us",
-    hl: "en",
-    label: "Seattle, WA",
-  },
-];
 
 // ---------------------------------------------------------------------------
 // 2. Search Budget Estimation
