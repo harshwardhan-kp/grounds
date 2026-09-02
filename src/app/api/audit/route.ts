@@ -1,4 +1,5 @@
 import { checkRateLimit, clientKeyFrom, recordRun } from "@/lib/judge-mode";
+import { isSerpApiConfigured } from "@/lib/serpapi/client";
 import { depose, DEFAULT_LOCALES, parseAiOverview } from "@/lib/engine/deposition";
 import { decomposeClaims, crossExamineMany } from "@/lib/engine/crossexam";
 import { BudgetLedger, BudgetExceededError } from "@/lib/serpapi/client";
@@ -70,6 +71,23 @@ export async function POST(req: Request): Promise<Response> {
    * budget must get a designed message pointing at the recorded dossier, never
    * an unhandled 429 from SerpApi part-way through a stream.
    */
+  /*
+   * The public demo runs without a SerpApi key on purpose, so it cannot spend
+   * the monthly quota. Say so plainly and point at the recorded dossier rather
+   * than letting a missing-key error surface part-way through the stream.
+   */
+  if (!isSerpApiConfigured()) {
+    return Response.json(
+      {
+        error:
+          "Live audits are turned off on this deployment, so it cannot spend search quota. The recorded dossier shows the full pipeline output, and its archive verification still works.",
+        recordedDossierUrl: "/dossier/wolf-river",
+        liveDisabled: true,
+      },
+      { status: 503 },
+    );
+  }
+
   const clientKey = clientKeyFrom(req);
   const decision = checkRateLimit(clientKey);
   if (!decision.allowed) {

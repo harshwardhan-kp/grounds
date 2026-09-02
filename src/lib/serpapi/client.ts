@@ -520,3 +520,15 @@ export async function serp<T = unknown>(
 
   throw lastError ?? new Error("SerpApi request failed unexpectedly.");
 }
+
+
+/**
+ * Whether live search is available at all.
+ *
+ * The public demo is deliberately deployed without a key so it cannot spend the
+ * monthly search quota. Callers use this to present a designed "live audit is
+ * off" state instead of letting a missing-key error surface mid-stream.
+ */
+export function isSerpApiConfigured(): boolean {
+  return typeof process.env.SERPAPI_KEY === "string" && process.env.SERPAPI_KEY.length > 0;
+}

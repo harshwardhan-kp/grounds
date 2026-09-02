@@ -122,7 +122,18 @@ export function DepositionGrid() {
       });
 
       if (!res.ok) {
-        throw new Error(`Audit request failed with status ${res.status}`);
+        /*
+         * 503 means live audits are off on this deployment; 429 means the shared
+         * demo budget is spent. Both carry a human-readable reason and a pointer
+         * to the recorded dossier — surface that rather than a status code.
+         */
+        const detail = (await res.json().catch(() => null)) as {
+          error?: string;
+          recordedDossierUrl?: string;
+        } | null;
+        throw new Error(
+          detail?.error ?? `Audit request failed with status ${res.status}`,
+        );
       }
 
       if (!res.body) {
