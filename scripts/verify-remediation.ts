@@ -5,7 +5,8 @@
  */
 import * as fs from "node:fs";
 import { proposeRemedies, sortRemedies } from "../src/lib/engine/remediation.ts";
-import type { Adjudication, ClaimCluster, Remedy, Verdict } from "../src/lib/types.ts";
+import type { Remedy } from "../src/lib/engine/remediation.ts";
+import type { Adjudication, ClaimCluster, Verdict } from "../src/lib/types.ts";
 
 for (const line of fs.readFileSync(new URL("../.env.local", import.meta.url), "utf8").split("\n")) {
   const m = /^([A-Z_]+)=(.*)$/.exec(line);
