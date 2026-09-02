@@ -38,3 +38,19 @@ an entity that the sources the AI itself cited do not support. Full spec: docs/S
 - 2026-09-02: Fixtures-first architecture. Rationale: 250-search free tier means live
   runs are precious; deterministic fixtures let workers build+test without spend, and
   double as the Judge Mode cache required by the spec.
+
+## Key finding — 2026-09-02, live SerpApi
+Ran `google_ai_mode` on "is Wolf River Electric being sued" from Minneapolis.
+Search id `6a97eeedbadf0b0ca4fff9b6`. Structure confirmed exactly as specced:
+`text_blocks` (typed) + `references[]` with index/title/link/snippet/source, plus a
+bonus `reconstructed_markdown` field.
+
+**Google has since corrected this answer.** It now states the original AI Overview
+made "a prominent error" and that the company is the plaintiff, not the defendant.
+
+Implications, and they are good ones:
+- Google's own current answer corroborates that the historical defect was real.
+- Answers change over time -> continuous re-deposition is the product, not a feature.
+- The demo must be honest: the fixture is labelled as the RECORDED historical
+  dossier; live probes demonstrate the instrument working on today's answer.
+  Do not present the fixture as a live finding.
