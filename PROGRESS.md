@@ -36,8 +36,9 @@ an entity that the sources the AI itself cited do not support. Full spec: docs/S
 | 13 | Forensic Inspector drawer | worker | DONE — browser-verified |
 | 14 | Archive verification endpoint | worker | DONE — MATCH proven |
 | 15 | Live capture + LiveCapture panel | worker | DONE |
-| 16 | Judge Mode caching | worker | NOT STARTED |
-| 17 | Fixture: add missing defect clusters | worker | NOT STARTED |
+| 16 | Judge Mode rate limiting | worker | DONE — 9/9 verification |
+| 17 | Fixture: all five defect classes | supervisor | DONE |
+| 18 | README | worker | DONE |
 
 ## Blockers
 None. Keys supplied and both verified live.
@@ -88,13 +89,13 @@ is now demonstrable by a stranger clicking one button.
 expire after 31 days, so re-run it before any demo.
 
 ## NEXT SESSION — start here
-1. Judge Mode: per-visitor live-run cap and a designed budget-exhausted state, so a
-   judge auditing their own employer never sees a 429 stack trace.
-2. Fixture yields only 2 defect clusters; needs MISCITED, CONTRADICTED, STALE too.
-3. Defect register table overflows on the engines column.
-4. Adjudication is the slow phase (~15s/claim on muse). Consider parallelising
-   crossExamine across claims with a small concurrency limit.
-5. README with setup, and the Devpost writeup.
+1. Deploy to Vercel and confirm the SSE stream survives the platform's buffering.
+2. Adjudication is the slow phase (~15s/claim on muse). Parallelise crossExamine
+   across claims with a small concurrency limit.
+3. Remediation stage (pivot source + drafted correction) is specced, not built.
+4. Devpost writeup and the demo recording.
+5. Re-run `npx tsx scripts/capture-observation.ts` before any demo — SerpApi
+   archives expire after 31 days and the Verify button depends on a live record.
 
 ## Known gaps
 - Fixture yields only 2 defect clusters; spec called for 5 verdict classes.
