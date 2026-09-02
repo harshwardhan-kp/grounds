@@ -21,18 +21,38 @@ an entity that the sources the AI itself cited do not support. Full spec: docs/S
 | # | Task | Owner | State |
 |---|------|-------|-------|
 | 0 | Repo + scaffold + git identity | supervisor | DONE |
-| 1 | Design tokens + shell UI | supervisor | IN PROGRESS |
-| 2 | SerpApi client wrapper + observations store | worker | PENDING |
-| 3 | Fixtures (recorded payloads for offline dev) | worker | PENDING |
-| 4 | Claim decomposition | worker | PENDING |
-| 5 | Cross-examination / adjudicator | worker | PENDING |
-| 6 | Scoring + divergence | worker | PENDING |
-| 7 | UI screens | worker | PENDING |
-| 8 | Forensic Inspector + Judge Mode | worker | PENDING |
+| 1 | Design tokens + type contract | supervisor | DONE |
+| 2 | SerpApi client chokepoint | worker | DONE — runtime-verified |
+| 3 | Wolf River fixture | worker | DONE — regenerated after collision |
+| 4 | Adjudication decision core | worker | DONE — 15/15 verification |
+| 5 | LLM gateway (muse) | worker | DONE — live-verified |
+| 6 | Deposition grid executor | worker | DONE — not yet run live |
+| 7 | Verdict UI primitives | worker | DONE |
+| 8 | Dossier page | worker | DONE — renders, screenshotted |
+| 9 | Landing / intake page | worker | DONE — renders |
+| 10 | Cross-examination engine | worker | DONE — not yet run live |
+| 11 | Live audit API route + deposition UI | worker | NOT STARTED |
+| 12 | Forensic Inspector drawer | worker | NOT STARTED |
+| 13 | Judge Mode caching | worker | NOT STARTED |
 
 ## Blockers
-- SERPAPI_KEY and ANTHROPIC_API_KEY not yet provided. Requested from user.
-  Build proceeds fixtures-first; live mode gated behind key presence.
+None. Keys supplied and both verified live.
+
+## Verified working
+- SerpApi: free plan, 249/250 searches left. `google_ai_mode` returns
+  `text_blocks` + `references[]` exactly as specced. Sample id 6a97eeedbadf0b0ca4fff9b6.
+- LLM: `muse-spark-1.2-contributor` via https://api.meta.ai/v1/messages.
+  NOTE the model id has NO `[1m]` suffix — that variant 404s.
+  It emits `redacted_thinking` blocks before the text block, so the gateway must
+  filter to type === "text". It does. Needs generous max_tokens (~235 thinking
+  tokens even for a trivial prompt).
+- `npm run build` passes. Routes: / and /dossier/[id].
+
+## Known gaps
+- The pipeline (depose -> decompose -> crossExamine) is written and typechecks but
+  has NOT been run end to end against live search. That is the next task.
+- Fixture yields only 2 defect clusters; spec called for 5 verdict classes.
+- Defect register table overflows horizontally on the engines column.
 
 ## Decisions log
 - 2026-09-02: Fixtures-first architecture. Rationale: 250-search free tier means live

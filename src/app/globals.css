@@ -141,6 +141,13 @@ body {
   margin: 0;
 }
 
+/* The viewer paints its own ground behind the page; html must carry the token
+   too or short pages show a band of the host background below the content. */
+html {
+  background: var(--ground);
+  min-height: 100%;
+}
+
 body {
   background: var(--ground);
   color: var(--ink);
