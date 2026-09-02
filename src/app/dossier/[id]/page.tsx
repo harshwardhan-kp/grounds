@@ -1,3 +1,5 @@
+import { ForensicInspector } from "@/components/ForensicInspector";
+import { LiveCapture } from "@/components/LiveCapture";
 import { WOLF_RIVER_FIXTURE } from "../../../../fixtures/wolf-river";
 import {
   VerdictChip,
@@ -41,6 +43,26 @@ const SEVERITY_ORDER: Record<string, number> = {
 function truncate(str: string, maxLen = 80): string {
   if (str.length <= maxLen) return str;
   return str.slice(0, maxLen - 1) + "…";
+}
+
+/** Pull the typed text blocks out of a raw SerpApi payload for the inspector. */
+function extractTextBlocks(obs?: Observation): { type: string; snippet: string }[] {
+  if (!obs?.raw || typeof obs.raw !== "object") return [];
+  const rawObj = obs.raw as Record<string, unknown>;
+  const nested = (rawObj.ai_overview as Record<string, unknown> | undefined)
+    ?.text_blocks;
+  const blocks = Array.isArray(rawObj.text_blocks)
+    ? rawObj.text_blocks
+    : Array.isArray(nested)
+      ? nested
+      : [];
+  return blocks.map((b) => {
+    const o = (b ?? {}) as Record<string, unknown>;
+    return {
+      type: typeof o.type === "string" ? o.type : "paragraph",
+      snippet: typeof o.snippet === "string" ? o.snippet : "",
+    };
+  });
 }
 
 function extractReferences(obs?: Observation): Reference[] {
@@ -193,6 +215,17 @@ export default async function DossierPage({ params }: PageProps) {
           <span className="meta">UNVERIFIABLE</span> stance and are strictly
           excluded from defect scoring.
         </p>
+      </section>
+
+      {/* Genuine capture, so a reviewer can re-verify one finding for real. */}
+      <section className="flex flex-col gap-3">
+        <h2 className="meta">Today&rsquo;s answer, captured live</h2>
+        <p className="max-w-[68ch] text-sm text-muted">
+          The dossier below is a recorded audit. This one observation is real and
+          its SerpApi archive record still exists, so the verification in its
+          inspector can be checked against SerpApi rather than taken on trust.
+        </p>
+        <LiveCapture />
       </section>
 
       {/* 4. DEFECT REGISTER */}
@@ -365,7 +398,22 @@ export default async function DossierPage({ params }: PageProps) {
                 </div>
 
                 {adjudication ? (
-                  <EvidencePanel {...panelProps} />
+                  <>
+                    <EvidencePanel {...panelProps} />
+                    {observation ? (
+                      <ForensicInspector
+                        observationId={observation.id}
+                        searchId={observation.searchId}
+                        payloadHash={observation.payloadHash}
+                        params={observation.params}
+                        latencyMs={observation.latencyMs}
+                        capturedAt={observation.capturedAt}
+                        textBlocks={extractTextBlocks(observation)}
+                        references={references}
+                        suppressed={observation.suppressed}
+                      />
+                    ) : null}
+                  </>
                 ) : (
                   <div className="border border-rule bg-surface p-4 text-sm text-muted">
                     No adjudication record available for claim{" "}

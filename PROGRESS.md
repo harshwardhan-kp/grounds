@@ -33,9 +33,11 @@ an entity that the sources the AI itself cited do not support. Full spec: docs/S
 | 10 | Cross-examination engine | worker | DONE — not yet run live |
 | 11 | Live audit API route (SSE) | worker | DONE — verified live |
 | 12 | Deposition grid UI + /depose page | worker | DONE — not yet browser-tested |
-| 13 | Forensic Inspector drawer | worker | NOT STARTED |
-| 14 | Judge Mode caching | worker | NOT STARTED |
-| 15 | Fixture: add missing defect clusters | worker | NOT STARTED |
+| 13 | Forensic Inspector drawer | worker | DONE — browser-verified |
+| 14 | Archive verification endpoint | worker | DONE — MATCH proven |
+| 15 | Live capture + LiveCapture panel | worker | DONE |
+| 16 | Judge Mode caching | worker | NOT STARTED |
+| 17 | Fixture: add missing defect clusters | worker | NOT STARTED |
 
 ## Blockers
 None. Keys supplied and both verified live.
@@ -74,14 +76,25 @@ adjudicating -> 3x claim_adjudicated (all GROUNDED) -> complete.
 Confirms probe generation, the deposition grid, decomposition and cross-examination
 all compose behind one HTTP endpoint.
 
+## Chain of custody proven — 2026-09-02
+A payload captured by our own pipeline, re-fetched from SerpApi's archive,
+re-canonicalised and re-hashed, returns MATCH in the browser:
+  searchId 6a97eeedbadf0b0ca4fff9b6
+  hash     376b043ecf4241ea1754550e5890830cf40bbd1acfbc7867be231bd24bc7a10b
+This is the claim that distinguishes a GROUNDS finding from a screenshot, and it
+is now demonstrable by a stranger clicking one button.
+
+`npx tsx scripts/capture-observation.ts` refreshes the live capture. Archives
+expire after 31 days, so re-run it before any demo.
+
 ## NEXT SESSION — start here
-1. Browser-test /depose (the grid has not been rendered in a browser yet).
-2. Forensic Inspector drawer: raw text_blocks + references[], archive verify button
-   (GET serpapi.com/searches/{id} and byte-compare against stored payloadHash),
-   and the uule/gl/hl + latency panel. Highest-leverage remaining feature.
-3. Judge Mode: "Load landmark case" instant cached dossier + per-visitor live cap.
-4. Fixture yields only 2 defect clusters; needs MISCITED, CONTRADICTED, STALE too.
-5. Defect register table overflows on the engines column.
+1. Judge Mode: per-visitor live-run cap and a designed budget-exhausted state, so a
+   judge auditing their own employer never sees a 429 stack trace.
+2. Fixture yields only 2 defect clusters; needs MISCITED, CONTRADICTED, STALE too.
+3. Defect register table overflows on the engines column.
+4. Adjudication is the slow phase (~15s/claim on muse). Consider parallelising
+   crossExamine across claims with a small concurrency limit.
+5. README with setup, and the Devpost writeup.
 
 ## Known gaps
 - Fixture yields only 2 defect clusters; spec called for 5 verdict classes.
