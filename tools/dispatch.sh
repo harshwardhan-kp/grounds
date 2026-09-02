@@ -50,10 +50,10 @@ if [ "$ACCOUNT" = "account2" ]; then
   security unlock-keychain -p "agy-profile-account2" \
     "$PROFILE/Library/Keychains/login.keychain-db" >/dev/null 2>&1 || true
   env HOME="$PROFILE" agy -p "$(cat "$PROMPT")" \
-    --model gemini-3.7-flash-high --effort high > "$LOG" 2>&1
+    --model gemini-3.8-flash-high --effort high > "$LOG" 2>&1
 else
   agy -p "$(cat "$PROMPT")" \
-    --model gemini-3.7-flash-high --effort high > "$LOG" 2>&1
+    --model gemini-3.8-flash-high --effort high > "$LOG" 2>&1
 fi
 
 # Strip the fence. Everything between the first ``` line and the last ``` line.

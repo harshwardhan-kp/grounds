@@ -88,11 +88,33 @@ is now demonstrable by a stranger clicking one button.
 `npx tsx scripts/capture-observation.ts` refreshes the live capture. Archives
 expire after 31 days, so re-run it before any demo.
 
+## Deployment — BLOCKED ON TWO USER ACTIONS (2026-09-02)
+Project: grounds / prj_Cht4GaFBL59ra1b3hN85kfwsUb2o (team_6AVjFywJRbnsVdBXqfX68VMK)
+First deploy reached Ready: grounds-m6ldjgg4s-...vercel.app
+
+1. **Vercel Authentication (SSO) is ON**, so every deployment URL 302s to
+   vercel.com/sso-api. A judge clicking the link hits a login wall. The Vercel MCP
+   returns 403 because it is connected to a DIFFERENT account than the CLI
+   (CLI identity: harshwardhan-250452-4621), so this must be turned off by hand:
+   Vercel dashboard -> project grounds -> Settings -> Deployment Protection ->
+   disable Vercel Authentication.
+
+2. **Three later deploys sit at status UNKNOWN** with `Builds: . [0ms]` and no build
+   logs — the build never started. Deployed by CLI, not git. Worth checking whether
+   the project should instead be connected to the GitHub repo so pushes build
+   normally, which is also better for the submission.
+
+Decision taken with the user: deploy WITHOUT keys. The app degrades to a designed
+state (503 + pointer to the recorded dossier) rather than spending search quota, so
+a public URL is safe. Reason: judge-mode rate limiting is in-memory, which on
+serverless is per-lambda and would not hold.
+
 ## NEXT SESSION — start here
-1. Deploy to Vercel and confirm the SSE stream survives the platform's buffering.
-2. Adjudication is the slow phase (~15s/claim on muse). Parallelise crossExamine
-   across claims with a small concurrency limit.
-3. Remediation stage (pivot source + drafted correction) is specced, not built.
+1. Unblock deployment (see the two actions above), then confirm the SSE stream
+   survives Vercel's response buffering — this is untested and could break the
+   live grid in production even though it works locally.
+2. Surface remediation in the dossier UI — the engine exists and is verified but
+   nothing renders it yet.
 4. Devpost writeup and the demo recording.
 5. Re-run `npx tsx scripts/capture-observation.ts` before any demo — SerpApi
    archives expire after 31 days and the Verify button depends on a live record.
