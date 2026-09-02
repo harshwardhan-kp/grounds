@@ -565,6 +565,16 @@ Return JSON:
 export async function crossExamine(opts: {
   claim: Claim;
   references: Reference[];
+  /**
+   * search_metadata.id of the observation this claim was extracted from.
+   *
+   * A judgement reached from a reference snippet consults no ADDITIONAL search —
+   * the snippet arrived with the original answer. Its provenance is therefore
+   * that parent search, and seeding the trail with it is what makes such a
+   * judgement evidentially traceable. Without this the empty-trail guard below
+   * would demote perfectly well-grounded claims to UNVERIFIABLE.
+   */
+  sourceSearchId?: string | null;
 }): Promise<Adjudication> {
   const [sourceJudgements, corroboration] = await Promise.all([
     testCitedSources({ claim: opts.claim, references: opts.references }),
@@ -573,6 +583,7 @@ export async function crossExamine(opts: {
 
   // Consolidate citation trail across all consulted searches
   const trailSet = new Set<string>();
+  if (opts.sourceSearchId) trailSet.add(opts.sourceSearchId);
   for (const sj of sourceJudgements) {
     for (const sid of sj.searchIds) {
       if (sid) trailSet.add(sid);

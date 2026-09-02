@@ -560,8 +560,9 @@ export async function depose(opts: DeposeOptions): Promise<Observation[]> {
           };
           registerSpend(opts.budget, 1);
           emitBudget();
-          rawPayload = await serp(recordedParams);
-          searchId = extractSearchId(rawPayload);
+          const res = await serp(recordedParams);
+          rawPayload = res.data;
+          searchId = res.searchId ?? extractSearchId(res.data);
         } else if (cell.engine === "google") {
           recordedParams = {
             engine: "google",
@@ -573,8 +574,8 @@ export async function depose(opts: DeposeOptions): Promise<Observation[]> {
           registerSpend(opts.budget, 1);
           emitBudget();
           const googleRes = await serp(recordedParams);
-          rawPayload = googleRes;
-          searchId = extractSearchId(googleRes);
+          rawPayload = googleRes.data;
+          searchId = googleRes.searchId ?? extractSearchId(googleRes.data);
 
           const pageToken = extractPageToken(googleRes);
           if (pageToken) {
@@ -591,8 +592,8 @@ export async function depose(opts: DeposeOptions): Promise<Observation[]> {
               page_token: pageToken,
             };
             const aioRes = await serp(aioParams);
-            rawPayload = aioRes;
-            searchId = extractSearchId(aioRes) ?? searchId;
+            rawPayload = aioRes.data;
+            searchId = aioRes.searchId ?? extractSearchId(aioRes.data) ?? searchId;
             recordedParams = aioParams;
           }
         } else {
@@ -605,8 +606,9 @@ export async function depose(opts: DeposeOptions): Promise<Observation[]> {
           };
           registerSpend(opts.budget, 1);
           emitBudget();
-          rawPayload = await serp(recordedParams);
-          searchId = extractSearchId(rawPayload);
+          const res = await serp(recordedParams);
+          rawPayload = res.data;
+          searchId = res.searchId ?? extractSearchId(res.data);
         }
       } catch (err: unknown) {
         if (isBudgetExceededError(err)) {

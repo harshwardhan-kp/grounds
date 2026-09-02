@@ -48,9 +48,24 @@ None. Keys supplied and both verified live.
   tokens even for a trivial prompt).
 - `npm run build` passes. Routes: / and /dossier/[id].
 
+## Pipeline verified live — 2026-09-02
+`npx tsx scripts/verify-pipeline.ts` runs depose -> decompose -> crossExamine
+against real search for ~1 search. Latest run:
+  6 text_blocks, 2 references, searchId 6a97eeedbadf0b0ca4fff9b6
+  12 atomic claims, correctly typed and polarised; claims about Google and the
+  MN Attorney General correctly marked as NOT about the target entity
+  verdict GROUNDED, confidence 0.92, 1 search id in trail, no review needed
+
+Two real bugs this caught, both of which typechecking could not have:
+1. `depose` stored the whole SerpResult envelope as Observation.raw instead of
+   `result.data`, so the parser saw no text_blocks and reported FALSE SUPPRESSION.
+   A silent, total failure that looked like normal Google behaviour.
+2. Snippet-channel judgements consult no additional search, so the citation trail
+   came back empty and the empty-trail guard demoted well-grounded claims to
+   UNVERIFIABLE. crossExamine now seeds the trail with the parent observation's
+   search id, which is the snippet's actual provenance.
+
 ## Known gaps
-- The pipeline (depose -> decompose -> crossExamine) is written and typechecks but
-  has NOT been run end to end against live search. That is the next task.
 - Fixture yields only 2 defect clusters; spec called for 5 verdict classes.
 - Defect register table overflows horizontally on the engines column.
 
