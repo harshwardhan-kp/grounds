@@ -1,6 +1,6 @@
 import { checkRateLimit, clientKeyFrom, recordRun } from "@/lib/judge-mode";
 import { depose, DEFAULT_LOCALES, parseAiOverview } from "@/lib/engine/deposition";
-import { decomposeClaims, crossExamine } from "@/lib/engine/crossexam";
+import { decomposeClaims, crossExamineMany } from "@/lib/engine/crossexam";
 import { BudgetLedger, BudgetExceededError } from "@/lib/serpapi/client";
 import { completeJson } from "@/lib/engine/llm";
 import type {
@@ -282,26 +282,26 @@ export async function POST(req: Request): Promise<Response> {
             .filter((c) => c.isAboutTarget && c.type === "factual")
             .slice(0, 3);
 
-          for (const claim of targetFactualClaims) {
-            if (req.signal.aborted) break;
-
-            const adjudication = await crossExamine({
-              claim,
-              references: parsed.references ?? [],
-              sourceSearchId: observation.searchId,
-            });
-
-            sendEvent({
-              kind: "log",
-              line: `  ${adjudication.verdict} — ${claim.text.slice(0, 72)}`,
-            });
-
-            sendEvent({
-              kind: "claim_adjudicated",
-              claimId: claim.id,
-              verdict: adjudication.verdict,
-            });
-          }
+          // Adjudication is the slow stage (~15s/claim). Bounded parallelism keeps a
+          // modest audit from taking minutes, without hammering the model endpoint.
+          await crossExamineMany({
+            claims: targetFactualClaims,
+            references: parsed.references ?? [],
+            sourceSearchId: observation.searchId,
+            concurrency: 3,
+            signal: req.signal,
+            onResult: (adjudication, claim) => {
+              sendEvent({
+                kind: "log",
+                line: `  ${adjudication.verdict} — ${claim.text.slice(0, 72)}`,
+              });
+              sendEvent({
+                kind: "claim_adjudicated",
+                claimId: claim.id,
+                verdict: adjudication.verdict,
+              });
+            },
+          });
         }
 
         if (req.signal.aborted) {

@@ -633,3 +633,135 @@ export async function crossExamine(opts: {
 
   return preliminary;
 }
+
+/**
+ * Cross-examine a batch of claims with bounded parallelism.
+ *
+ * WHY THIS EXISTS: Adjudication is the slowest pipeline stage (~15s per claim)
+ * because each claim requires multiple round-trips to evaluate source grounding
+ * and independent corroboration. Running claims serially stalls the audit UI,
+ * while unbounded parallelism risks throttling downstream model providers and
+ * exhausting the SerpApi search budget. Bounded concurrency balances throughput
+ * with quota discipline.
+ *
+ * Concurrency is clamped to [1, 6] with a default of 3 to prevent endpoint abuse.
+ *
+ * Callbacks via `onResult` fire in completion order as each worker finishes a claim,
+ * enabling responsive UI streaming. In contrast, the returned array guarantees
+ * exact input order preservation.
+ *
+ * Resilient to individual claim failures: errors are caught per claim and substituted
+ * with an UNVERIFIABLE adjudication so that a single failed claim never invalidates
+ * the entire batch.
+ *
+ * @param opts Options for batch cross-examination.
+ * @param opts.claims Atomic claims to evaluate.
+ * @param opts.references Grounding references cited by the search engine.
+ * @param opts.sourceSearchId Optional SerpApi search ID for the parent search.
+ * @param opts.concurrency Maximum parallel workers (default: 3, clamped to 1..6).
+ * @param opts.signal Cancellation signal. When aborted, pending dispatches halt
+ *                    and already completed results are returned without throwing.
+ * @param opts.onResult Progress hook invoked in completion order as each adjudication finishes.
+ *                      Order of callbacks is completion order.
+ * @returns Array of adjudications matching the exact input order of `claims`.
+ */
+export async function crossExamineMany(opts: {
+  claims: Claim[];
+  references: Reference[];
+  sourceSearchId?: string | null;
+  concurrency?: number; // default 3
+  signal?: AbortSignal;
+  onResult?: (a: Adjudication, claim: Claim) => void;
+}): Promise<Adjudication[]> {
+  const {
+    claims,
+    references,
+    sourceSearchId = null,
+    concurrency = 3,
+    signal,
+    onResult,
+  } = opts;
+
+  if (claims.length === 0) {
+    return [];
+  }
+
+  // Requirement 4: Respect signal before beginning work
+  if (signal?.aborted) {
+    return [];
+  }
+
+  // Requirement 5: Default concurrency 3, clamped strictly to 1..6
+  const rawConcurrency = concurrency ?? 3;
+  const safeConcurrency = Number.isFinite(rawConcurrency)
+    ? Math.min(6, Math.max(1, Math.floor(rawConcurrency)))
+    : 3;
+
+  // Requirement 1: Preserve input order in the returned array via indexed slots
+  const results: (Adjudication | undefined)[] = new Array(claims.length);
+  let cursor = 0;
+
+  async function worker(): Promise<void> {
+    while (true) {
+      // Requirement 4: Stop dispatching new work immediately when aborted
+      if (signal?.aborted) {
+        break;
+      }
+
+      if (cursor >= claims.length) {
+        break;
+      }
+
+      const index = cursor++;
+      const claim = claims[index];
+
+      let adjudication: Adjudication;
+
+      try {
+        // crossExamine does not take a signal; abortion is handled by the
+        // dispatch loop, which stops starting new work once the signal fires.
+        adjudication = await crossExamine({
+          claim,
+          references,
+          sourceSearchId,
+        });
+      } catch (err: unknown) {
+        // Requirement 3: Never let one failing claim abort the batch.
+        // Catch and substitute an UNVERIFIABLE verdict with an empty citation trail.
+        const message = err instanceof Error ? err.message : String(err);
+        adjudication = {
+          id: `adj-fallback-${claim.id}`,
+          claimId: claim.id,
+          verdict: "UNVERIFIABLE",
+          confidence: 0,
+          reasoning: `Cross-examination could not be completed for this claim: ${message}`,
+          sourceJudgements: [],
+          corroboration: null,
+          citationTrail: [],
+          survivedReview: false,
+          needsHumanReview: true,
+        };
+      }
+
+      results[index] = adjudication;
+
+      // Requirement 2: Call onResult as each adjudication completes (completion order)
+      try {
+        onResult?.(adjudication, claim);
+      } catch {
+        // Defend worker pool against errors in caller-supplied observer callbacks
+      }
+    }
+  }
+
+  const workerCount = Math.min(safeConcurrency, claims.length);
+  const workers: Promise<void>[] = [];
+  for (let i = 0; i < workerCount; i++) {
+    workers.push(worker());
+  }
+
+  await Promise.all(workers);
+
+  // Return completed adjudications in input order; filter out unreached indices if aborted
+  return results.filter((item): item is Adjudication => item !== undefined);
+}
