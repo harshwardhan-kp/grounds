@@ -88,26 +88,32 @@ is now demonstrable by a stranger clicking one button.
 `npx tsx scripts/capture-observation.ts` refreshes the live capture. Archives
 expire after 31 days, so re-run it before any demo.
 
-## Deployment — BLOCKED ON TWO USER ACTIONS (2026-09-02)
+## Deployment — PARTLY BLOCKED (2026-09-03)
 Project: grounds / prj_Cht4GaFBL59ra1b3hN85kfwsUb2o (team_6AVjFywJRbnsVdBXqfX68VMK)
-First deploy reached Ready: grounds-m6ldjgg4s-...vercel.app
+CLI identity: harshwardhan-250452-4621
 
-1. **Vercel Authentication (SSO) is ON**, so every deployment URL 302s to
-   vercel.com/sso-api. A judge clicking the link hits a login wall. The Vercel MCP
-   returns 403 because it is connected to a DIFFERENT account than the CLI
-   (CLI identity: harshwardhan-250452-4621), so this must be turned off by hand:
-   Vercel dashboard -> project grounds -> Settings -> Deployment Protection ->
-   disable Vercel Authentication.
+DONE: SSO deployment protection is disabled via
+`vercel project protection disable grounds --sso`. The site is publicly reachable:
+  https://grounds-harshwardhan-250452-4621s-projects.vercel.app
 
-2. **Three later deploys sit at status UNKNOWN** with `Builds: . [0ms]` and no build
-   logs — the build never started. Deployed by CLI, not git. Worth checking whether
-   the project should instead be connected to the GitHub repo so pushes build
-   normally, which is also better for the submission.
+STILL BROKEN: every deployment after the very first sits at status UNKNOWN with
+`Builds: . [0ms]`, `?` duration, and no retrievable build logs. Tried and ruled out:
+  - CLI `vercel deploy --prod`            -> UNKNOWN
+  - `vercel build` + `deploy --prebuilt`  -> UNKNOWN (skips remote build entirely,
+                                             so this is NOT a build failure)
+  - git-triggered build via push          -> UNKNOWN (repo is already connected)
+Only the first deploy (grounds-m6ldjgg4s, 26s) ever reached Ready.
+The Vercel MCP cannot help: `list_teams` returns [] and project calls 403, so that
+connection has no access to this scope. Diagnosis needs the Vercel dashboard —
+likely an account-level limit or a flag the CLI does not surface.
 
-Decision taken with the user: deploy WITHOUT keys. The app degrades to a designed
-state (503 + pointer to the recorded dossier) rather than spending search quota, so
-a public URL is safe. Reason: judge-mode rate limiting is in-memory, which on
-serverless is per-lambda and would not hold.
+PRACTICAL IMPACT: the public alias serves a STALE build. It lacks the keyless-guard
+commit, so a reviewer who clicks "Depose" on the live site sees a raw
+"SERPAPI_KEY environment variable is missing" error instead of the designed 503.
+The landing page, recorded dossier and Forensic Inspector all work.
+
+GOOD NEWS FROM THIS: SSE streams fine through Vercel — the live-audit endpoint
+returned `data:` frames from production. That production risk is now closed.
 
 ## NEXT SESSION — start here
 1. Unblock deployment (see the two actions above), then confirm the SSE stream

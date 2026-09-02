@@ -15,7 +15,7 @@ set -euo pipefail
 
 TASK_FILE="${1:?usage: dispatch.sh <task-file> <target-path> [account]}"
 TARGET="${2:?usage: dispatch.sh <task-file> <target-path> [account]}"
-ACCOUNT="${3:-account1}"
+ACCOUNT="${3:-account1}"  # account2 deprecated by user request; prefer parallel account1 instances
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
