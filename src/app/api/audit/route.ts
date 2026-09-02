@@ -1,3 +1,4 @@
+import { checkRateLimit, clientKeyFrom, recordRun } from "@/lib/judge-mode";
 import { depose, DEFAULT_LOCALES, parseAiOverview } from "@/lib/engine/deposition";
 import { decomposeClaims, crossExamine } from "@/lib/engine/crossexam";
 import { BudgetLedger, BudgetExceededError } from "@/lib/serpapi/client";
@@ -63,6 +64,30 @@ function clamp(val: unknown, min: number, max: number, defaultValue: number): nu
  * 4. Completion -> audit_state "complete" followed by log "__DONE__"
  */
 export async function POST(req: Request): Promise<Response> {
+  /*
+   * Rate limiting happens before anything else, and returns plain JSON rather
+   * than opening the SSE stream. A reviewer who exhausts the shared search
+   * budget must get a designed message pointing at the recorded dossier, never
+   * an unhandled 429 from SerpApi part-way through a stream.
+   */
+  const clientKey = clientKeyFrom(req);
+  const decision = checkRateLimit(clientKey);
+  if (!decision.allowed) {
+    return Response.json(
+      {
+        error: decision.reason,
+        retryAfterSeconds: decision.retryAfterSeconds,
+        recordedDossierUrl: "/dossier/wolf-river",
+      },
+      {
+        status: 429,
+        headers: decision.retryAfterSeconds
+          ? { "retry-after": String(decision.retryAfterSeconds) }
+          : undefined,
+      },
+    );
+  }
+
   let body: AuditRequestBody;
   try {
     body = (await req.json()) as AuditRequestBody;
@@ -195,6 +220,8 @@ export async function POST(req: Request): Promise<Response> {
         // -------------------------------------------------------------------
         // 2. Deposition
         // -------------------------------------------------------------------
+        recordRun(clientKey);
+
         sendEvent({
           kind: "audit_state",
           auditId,
