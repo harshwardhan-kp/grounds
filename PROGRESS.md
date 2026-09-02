@@ -31,9 +31,11 @@ an entity that the sources the AI itself cited do not support. Full spec: docs/S
 | 8 | Dossier page | worker | DONE — renders, screenshotted |
 | 9 | Landing / intake page | worker | DONE — renders |
 | 10 | Cross-examination engine | worker | DONE — not yet run live |
-| 11 | Live audit API route + deposition UI | worker | NOT STARTED |
-| 12 | Forensic Inspector drawer | worker | NOT STARTED |
-| 13 | Judge Mode caching | worker | NOT STARTED |
+| 11 | Live audit API route (SSE) | worker | DONE — verified live |
+| 12 | Deposition grid UI + /depose page | worker | DONE — not yet browser-tested |
+| 13 | Forensic Inspector drawer | worker | NOT STARTED |
+| 14 | Judge Mode caching | worker | NOT STARTED |
+| 15 | Fixture: add missing defect clusters | worker | NOT STARTED |
 
 ## Blockers
 None. Keys supplied and both verified live.
@@ -64,6 +66,22 @@ Two real bugs this caught, both of which typechecking could not have:
    came back empty and the empty-trail guard demoted well-grounded claims to
    UNVERIFIABLE. crossExamine now seeds the trail with the parent observation's
    search id, which is the snippet's actual provenance.
+
+## Live audit verified through the API — 2026-09-02
+POST /api/audit {"entity":"Wolf River Electric","probeCount":1,"localeCount":1}
+streamed 12 SSE events: probes_ready -> deposing -> cell_started/cell_done ->
+adjudicating -> 3x claim_adjudicated (all GROUNDED) -> complete.
+Confirms probe generation, the deposition grid, decomposition and cross-examination
+all compose behind one HTTP endpoint.
+
+## NEXT SESSION — start here
+1. Browser-test /depose (the grid has not been rendered in a browser yet).
+2. Forensic Inspector drawer: raw text_blocks + references[], archive verify button
+   (GET serpapi.com/searches/{id} and byte-compare against stored payloadHash),
+   and the uule/gl/hl + latency panel. Highest-leverage remaining feature.
+3. Judge Mode: "Load landmark case" instant cached dossier + per-visitor live cap.
+4. Fixture yields only 2 defect clusters; needs MISCITED, CONTRADICTED, STALE too.
+5. Defect register table overflows on the engines column.
 
 ## Known gaps
 - Fixture yields only 2 defect clusters; spec called for 5 verdict classes.
