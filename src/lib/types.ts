@@ -171,8 +171,9 @@ export interface CorroborationResult {
 }
 
 /**
- * Verdict taxonomy. Deliberately mirrors the categories defamation
- * practitioners already use, so output speaks the buyer's language.
+ * Verdict taxonomy. Deliberately mirrors the categories reputation and
+ * communications practitioners already use, so output speaks the buyer's
+ * language.
  */
 export type Verdict =
   | "GROUNDED" // cited sources support it and it checks out

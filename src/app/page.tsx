@@ -75,8 +75,8 @@ export default function HomePage() {
           In 2025 an AI Overview told searchers a Minnesota solar installer was
           being sued by the state Attorney General. It was not. The answer cited
           four sources; none of them contained the claim. The company reported
-          losing a $150,000 contract and sued Google for defamation; that
-          litigation is ongoing.
+          losing a $150,000 contract and has brought a case against Google over
+          the answer; that litigation is ongoing.
         </p>
         <p className="mt-3 text-sm leading-relaxed text-muted">
           Google has since corrected that answer — which is exactly why this has

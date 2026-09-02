@@ -109,6 +109,10 @@
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
   --color-ink: var(--ink);
+  /* Alias. Components written against `text-foreground` were silently resolving
+     to nothing and inheriting body colour, which happened to look right; this
+     makes the intent real so the utility works in every context. */
+  --color-foreground: var(--ink);
   --color-muted: var(--muted);
   --color-faint: var(--faint);
   --color-rule: var(--rule);
@@ -198,4 +202,96 @@ body {
 .scroll-x {
   overflow-x: auto;
   max-width: 100%;
+}
+
+/* ---------------------------------------------------------------------------
+ * Print — a dossier is a document before it is a page.
+ *
+ * A reviewer, a client or an adviser will want this on paper or as a PDF, and
+ * the on-screen theme is the wrong starting point for that: a dark dossier
+ * prints as a black slab. The tokens are redefined to the light palette here
+ * rather than in any component, so the rule that colour lives only in this file
+ * still holds. print-color-adjust keeps verdict chips and distribution bars
+ * filled — they carry meaning, so dropping them would change the document.
+ * ------------------------------------------------------------------------ */
+@media print {
+  :root,
+  :root[data-theme="dark"] {
+    --ground: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f5f6f8;
+    --surface-3: #e9ecef;
+    --ink: #11161d;
+    --muted: #4a545e;
+    --faint: #6e7883;
+    --rule: #c3cad1;
+    --rule-strong: #9aa4ae;
+    --accent: #16496b;
+    --accent-hover: #16496b;
+    --accent-soft: #e3ecf3;
+    --accent-ink: #ffffff;
+    --ok: #2a6048;
+    --ok-soft: #e2efe8;
+    --warn: #8a5d14;
+    --warn-soft: #f6eddc;
+    --critical: #8e2434;
+    --critical-soft: #f5e4e6;
+    --neutral: #4a545e;
+    --neutral-soft: #eceff2;
+  }
+
+  html,
+  body {
+    background: #ffffff;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  @page {
+    margin: 14mm;
+  }
+
+  /* Screen-only affordances: the print button itself, and anything that only
+     makes sense when it can be clicked. */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Panels are the unit of reading. Splitting one across a page break separates
+     a claim from the sources it is being tested against. */
+  article,
+  blockquote,
+  details {
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    break-after: avoid;
+  }
+
+  /* On paper there is nothing to scroll, so wide content must wrap instead of
+     being clipped at the container edge. */
+  .scroll-x {
+    overflow-x: visible;
+  }
+
+  pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* A citation is not checkable if its URL is invisible. */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--muted);
+    word-break: break-all;
+  }
 }

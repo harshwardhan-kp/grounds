@@ -4,7 +4,7 @@ Every AI answer about you, cross-examined against its own sources.
 
 ## The problem
 
-In 2025, a Google AI Overview told searchers that a Minnesota solar installer was being sued by the state Attorney General. It was not. The generative answer cited four sources, and none of them contained the claim. The company reported losing a $150,000 contract and sued Google for defamation; that litigation is ongoing. Separately, courts have begun letting AI-defamation claims past the pleading stage. Google has since corrected that specific answer — which demonstrates the fundamental challenge: generative answers change continuously, requiring grounding to be measured and tracked over time.
+In 2025, a Google AI Overview told searchers that a Minnesota solar installer was being sued by the state Attorney General. It was not. The generative answer cited four sources, and none of them contained the claim. The company reported losing a $150,000 contract and has brought a case against Google over the answer; that litigation is ongoing. Separately, courts have begun letting comparable claims about AI-generated statements past the pleading stage. Google has since corrected that specific answer — which demonstrates the fundamental challenge: generative answers change continuously, requiring grounding to be measured and tracked over time.
 
 Existing AI visibility tools measure whether a brand is mentioned, which prompts trigger visibility, and how sentiment trends. None inspect whether the sources the AI explicitly cited alongside a sentence actually contain or support that assertion. Grounds exists to measure and enforce that property: **attribution integrity**.
 
@@ -16,6 +16,9 @@ Existing AI visibility tools measure whether a brand is mentioned, which prompts
 4. **Claim decomposition**: Extracts text blocks from generative responses and parses them into atomic, verifiable subject-predicate-object claims bound to their block citations.
 5. **Cross-examination**: Evaluates each claim against cited snippets, fetched pages, and secondary corroboration searches to assess evidentiary support.
 6. **Divergence and scoring**: Clusters identical assertions across locales, detects regional inconsistencies, and computes attribution integrity and Grounds scores.
+7. **Remediation**: For each defect cluster, identifies the pivot source — the single cited document the answer leans on hardest — and drafts prioritised actions against it. `UNVERIFIABLE` clusters produce no remedy.
+
+The dossier page renders remediation from committed example drafts (`fixtures/remedies.ts`), labelled as examples on the page, so it works without an LLM key. A live audit drafts them at request time from its own findings.
 
 ## Verdicts
 

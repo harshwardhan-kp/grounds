@@ -1,5 +1,9 @@
 import { ForensicInspector } from "@/components/ForensicInspector";
 import { LiveCapture } from "@/components/LiveCapture";
+import { DivergenceMap } from "@/components/DivergenceMap";
+import { PrintDossier } from "@/components/PrintDossier";
+import { RemediationPlan } from "@/components/RemediationPlan";
+import { VerdictDistribution } from "@/components/VerdictDistribution";
 import { WOLF_RIVER_FIXTURE } from "../../../../fixtures/wolf-river";
 import {
   VerdictChip,
@@ -179,6 +183,8 @@ export default async function DossierPage({ params }: PageProps) {
             {audit.searchesSpent} / {audit.searchBudget} Searches Spent
           </span>
         </div>
+
+        <PrintDossier />
       </header>
 
       {/* 2. SCORE STRIP */}
@@ -215,6 +221,20 @@ export default async function DossierPage({ params }: PageProps) {
           <span className="meta">UNVERIFIABLE</span> stance and are strictly
           excluded from defect scoring.
         </p>
+      </section>
+
+      {/* 3b. VERDICT DISTRIBUTION */}
+      <section className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-base font-serif text-ink uppercase tracking-wider">
+            Verdict Distribution
+          </h2>
+          <p className="text-xs text-muted">
+            Every adjudicated cluster in this audit, grouped by what its cited
+            sources turned out to say.
+          </p>
+        </div>
+        <VerdictDistribution clusters={clusters} />
       </section>
 
       {/* Genuine capture, so a reviewer can re-verify one finding for real. */}
@@ -305,6 +325,22 @@ export default async function DossierPage({ params }: PageProps) {
         </div>
       </section>
 
+      {/* 4b. GEOGRAPHIC DIVERGENCE */}
+      <section className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-base font-serif text-ink uppercase tracking-wider">
+            Geographic Divergence
+          </h2>
+          <p className="max-w-[72ch] text-xs text-muted leading-relaxed">
+            Which markets produced each assertion, and which markets were
+            sampled and did not. Generative answers are not the same everywhere,
+            so an assertion present in one market and absent in another is the
+            reason a single screenshot cannot be a finding.
+          </p>
+        </div>
+        <DivergenceMap clusters={clusters} locales={audit.locales ?? []} />
+      </section>
+
       {/* 5. EVIDENCE */}
       <section className="flex flex-col gap-6">
         <div className="flex flex-col gap-1">
@@ -318,6 +354,13 @@ export default async function DossierPage({ params }: PageProps) {
         </div>
 
         <div className="flex flex-col gap-8">
+          {sortedDefects.length === 0 ? (
+            <div className="border border-rule bg-surface p-6 text-sm text-muted">
+              No defect cluster was recorded, so there is nothing to cross-examine
+              here. Every assertion sampled either held up against the sources
+              cited with it, or was excluded from scoring.
+            </div>
+          ) : null}
           {sortedDefects.map((cluster) => {
             const firstClaimId = cluster.memberClaimIds?.[0];
             const claim = firstClaimId
@@ -426,7 +469,10 @@ export default async function DossierPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* 6. FOOTER */}
+      {/* 6. REMEDIATION */}
+      <RemediationPlan clusters={sortedDefects} totalLocales={totalLocales} />
+
+      {/* 7. FOOTER */}
       <footer className="mt-8 pt-8 border-t border-rule text-xs text-muted flex flex-col gap-4">
         <div className="meta uppercase tracking-wider text-muted">
           Methodology & Chain of Custody

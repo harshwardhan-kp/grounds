@@ -30,7 +30,7 @@ export interface SerpParams {
 /**
  * Normalized result wrapper preserving evidentiary provenance.
  *
- * Defamation and misattribution audits require strict chain-of-custody tracking.
+ * Attribution and misattribution audits require strict chain-of-custody tracking.
  * We capture the SHA-256 hash of the canonical response payload for tamper verification,
  * preserve SerpApi's third-party search ID for independent subpoena/discovery corroboration,
  * and record wall-clock timestamps and latency to measure engine responsiveness.
