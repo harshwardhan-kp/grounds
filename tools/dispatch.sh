@@ -20,7 +20,9 @@ ACCOUNT="${3:-account1}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-STAMP="$(date +%Y%m%d-%H%M%S)"
+# Include the PID: two dispatches launched in the same second would otherwise
+# share a prompt file and silently run each other's task.
+STAMP="$(date +%Y%m%d-%H%M%S)-$$"
 LOGDIR="$ROOT/.worker-logs"
 mkdir -p "$LOGDIR"
 LOG="$LOGDIR/$(basename "$TARGET" | tr '/.' '__')-$STAMP.log"
