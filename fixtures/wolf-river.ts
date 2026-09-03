@@ -28,7 +28,7 @@ const LOCALES: Locale[] = [
     label: "Minneapolis, MN",
   },
   {
-    id: "us-mn-stpaul",
+    id: "us-mn-saint-paul",
     location: "Saint Paul, Minnesota, United States",
     gl: "us",
     hl: "en",
@@ -202,7 +202,7 @@ const OBSERVATIONS: Observation[] = [
     id: "obs_02",
     auditId: AUDIT_ID,
     probeId: "prb_adv_lawsuit",
-    localeId: "us-mn-stpaul",
+    localeId: "us-mn-saint-paul",
     engine: "google_ai_mode",
     params: {
       q: "is Wolf River Electric being sued by minnesota attorney general",
@@ -585,7 +585,7 @@ const OBSERVATIONS: Observation[] = [
     id: "obs_11",
     auditId: AUDIT_ID,
     probeId: "prb_qual_licenses",
-    localeId: "us-mn-stpaul",
+    localeId: "us-mn-saint-paul",
     engine: "google_ai_mode",
     params: {
       q: "Wolf River Electric NABCEP certifications and state electrical licenses",
@@ -1459,7 +1459,7 @@ const CLUSTERS: ClaimCluster[] = [
     canonicalText: "A standard residential 8kW rooftop solar installation through the company costs approximately $21,500 before federal tax credits.",
     verdict: "MISCITED",
     polarity: "neutral",
-    observedInLocales: ["us-mn-minneapolis", "us-mn-stpaul", "us-wi-milwaukee"],
+    observedInLocales: ["us-mn-minneapolis", "us-mn-saint-paul", "us-wi-milwaukee"],
     absentInLocales: [
       "us-il-chicago",
       "us-tx-austin",
@@ -1481,7 +1481,7 @@ const CLUSTERS: ClaimCluster[] = [
     polarity: "neutral",
     observedInLocales: ["us-mn-minneapolis", "us-il-chicago"],
     absentInLocales: [
-      "us-mn-stpaul",
+      "us-mn-saint-paul",
       "us-wi-milwaukee",
       "us-tx-austin",
       "us-co-denver",
@@ -1500,7 +1500,7 @@ const CLUSTERS: ClaimCluster[] = [
     canonicalText: "Wolf River Electric provides a standard 10-year workmanship warranty on all residential panel installations.",
     verdict: "STALE",
     polarity: "neutral",
-    observedInLocales: ["us-mn-minneapolis", "us-mn-stpaul"],
+    observedInLocales: ["us-mn-minneapolis", "us-mn-saint-paul"],
     absentInLocales: [
       "us-il-chicago",
       "us-wi-milwaukee",
@@ -1523,7 +1523,7 @@ const CLUSTERS: ClaimCluster[] = [
     polarity: "neutral",
     observedInLocales: ["us-mn-minneapolis"],
     absentInLocales: [
-      "us-mn-stpaul",
+      "us-mn-saint-paul",
       "us-il-chicago",
       "us-wi-milwaukee",
       "us-tx-austin",
@@ -1546,7 +1546,7 @@ const CLUSTERS: ClaimCluster[] = [
     polarity: "adverse",
     observedInLocales: [
       "us-mn-minneapolis",
-      "us-mn-stpaul",
+      "us-mn-saint-paul",
       "us-il-chicago",
       "us-wi-milwaukee",
     ],
@@ -1571,7 +1571,7 @@ const CLUSTERS: ClaimCluster[] = [
     polarity: "neutral",
     observedInLocales: [
       "us-mn-minneapolis",
-      "us-mn-stpaul",
+      "us-mn-saint-paul",
       "us-il-chicago",
       "us-wi-milwaukee",
       "us-az-phoenix",
@@ -1594,7 +1594,7 @@ const CLUSTERS: ClaimCluster[] = [
     observedInLocales: ["us-wi-milwaukee"],
     absentInLocales: [
       "us-mn-minneapolis",
-      "us-mn-stpaul",
+      "us-mn-saint-paul",
       "us-il-chicago",
       "us-tx-austin",
       "us-co-denver",
@@ -1616,7 +1616,7 @@ const CLUSTERS: ClaimCluster[] = [
     polarity: "neutral",
     observedInLocales: [
       "us-mn-minneapolis",
-      "us-mn-stpaul",
+      "us-mn-saint-paul",
       "us-wa-seattle",
     ],
     absentInLocales: [

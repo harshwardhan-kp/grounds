@@ -36,6 +36,8 @@ function getCellBgClass(status: CellStatus): string {
 
 export function DepositionGrid() {
   const [entity, setEntity] = useState<string>("");
+  const [mode, setMode] = useState<"idle" | "live" | "replay">("idle");
+  const [liveDisabled, setLiveDisabled] = useState<boolean>(false);
   const [running, setRunning] = useState<boolean>(false);
   const [logLines, setLogLines] = useState<string[]>([]);
   const [cellStates, setCellStates] = useState<Map<string, CellStatus>>(
@@ -85,21 +87,12 @@ export function DepositionGrid() {
       ? Math.min(100, Math.max(0, Math.round((budget.spent / budget.limit) * 100)))
       : 0;
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (running || !entity.trim()) {
-      return;
-    }
-
-    abortControllerRef.current?.abort();
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-
-    setRunning(true);
+  function resetRunState() {
     setError(null);
     setLogLines([]);
     setCellStates(new Map());
     setProbes([]);
+    setProbeQueries(new Map());
     setLocales([]);
     setBudget({ spent: 0, limit: 0 });
     setVerdictCounts({
@@ -112,6 +105,144 @@ export function DepositionGrid() {
       UNVERIFIABLE: 0,
       OPINION: 0,
     });
+  }
+
+  async function consumeStream(res: Response) {
+    if (!res.body) {
+      throw new Error("Response body is missing");
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let isDone = false;
+
+    while (!isDone) {
+      const { value, done } = await reader.read();
+      if (done) {
+        break;
+      }
+
+      buffer += decoder.decode(value, { stream: true });
+      const parts = buffer.split("\n\n");
+      buffer = parts.pop() ?? "";
+
+      for (const part of parts) {
+        const trimmed = part.trim();
+        if (!trimmed) {
+          continue;
+        }
+
+        let payload = trimmed;
+        if (payload.startsWith("data: ")) {
+          payload = payload.slice(6).trim();
+        } else if (payload.startsWith("data:")) {
+          payload = payload.slice(5).trim();
+        }
+
+        if (!payload) {
+          continue;
+        }
+
+        try {
+          const event: PipelineEvent = JSON.parse(payload);
+          switch (event.kind) {
+            case "budget":
+              setBudget({ spent: event.spent, limit: event.budget });
+              break;
+
+            case "cell_started":
+              setProbes((prev) =>
+                prev.includes(event.probeId) ? prev : [...prev, event.probeId]
+              );
+              setLocales((prev) =>
+                prev.includes(event.localeId)
+                  ? prev
+                  : [...prev, event.localeId]
+              );
+              setCellStates((prev) => {
+                const next = new Map(prev);
+                next.set(`${event.probeId}::${event.localeId}`, "running");
+                return next;
+              });
+              break;
+
+            case "cell_done":
+              setProbes((prev) =>
+                prev.includes(event.probeId) ? prev : [...prev, event.probeId]
+              );
+              setLocales((prev) =>
+                prev.includes(event.localeId)
+                  ? prev
+                  : [...prev, event.localeId]
+              );
+              setCellStates((prev) => {
+                const next = new Map(prev);
+                const status: CellStatus = event.suppressed
+                  ? "suppressed"
+                  : "done";
+                next.set(`${event.probeId}::${event.localeId}`, status);
+                return next;
+              });
+              break;
+
+            case "claim_adjudicated":
+              setVerdictCounts((prev) => ({
+                ...prev,
+                [event.verdict]: (prev[event.verdict] ?? 0) + 1,
+              }));
+              break;
+
+            case "log":
+              if (event.line === "__DONE__") {
+                isDone = true;
+                await reader.cancel();
+              } else {
+                setLogLines((prev) => [...prev, event.line]);
+              }
+              break;
+
+            case "error":
+              setError(event.message);
+              break;
+
+            case "probes": {
+              // Row order is fixed here, before any cell arrives, so rows do
+              // not reshuffle as results stream in.
+              setProbes(event.probes.map((pr) => pr.id));
+              setProbeQueries(
+                new Map(event.probes.map((pr) => [pr.id, pr.query])),
+              );
+              break;
+            }
+
+            case "audit_state":
+              break;
+          }
+        } catch {
+          // Drop unparseable payload chunks
+        }
+
+        if (isDone) {
+          break;
+        }
+      }
+    }
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (running || !entity.trim()) {
+      return;
+    }
+
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    setMode("live");
+    setRunning(true);
+    resetRunState();
 
     try {
       const res = await fetch("/api/audit", {
@@ -129,133 +260,63 @@ export function DepositionGrid() {
          */
         const detail = (await res.json().catch(() => null)) as {
           error?: string;
+          liveDisabled?: boolean;
           recordedDossierUrl?: string;
         } | null;
+
+        if (res.status === 503 || detail?.liveDisabled) {
+          setLiveDisabled(true);
+          setMode("idle");
+          return;
+        }
+
         throw new Error(
           detail?.error ?? `Audit request failed with status ${res.status}`,
         );
       }
 
-      if (!res.body) {
-        throw new Error("Response body is missing");
+      await consumeStream(res);
+    } catch (err: unknown) {
+      if (err instanceof DOMException && err.name === "AbortError") {
+        return;
+      }
+      const message =
+        err instanceof Error ? err.message : "An unexpected error occurred";
+      setError(message);
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  async function handleReplay() {
+    if (running) {
+      return;
+    }
+
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    setMode("replay");
+    setRunning(true);
+    resetRunState();
+
+    try {
+      const res = await fetch("/api/replay", {
+        method: "GET",
+        signal: controller.signal,
+      });
+
+      if (!res.ok) {
+        const detail = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        throw new Error(
+          detail?.error ?? `Replay request failed with status ${res.status}`,
+        );
       }
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-      let isDone = false;
-
-      while (!isDone) {
-        const { value, done } = await reader.read();
-        if (done) {
-          break;
-        }
-
-        buffer += decoder.decode(value, { stream: true });
-        const parts = buffer.split("\n\n");
-        buffer = parts.pop() ?? "";
-
-        for (const part of parts) {
-          const trimmed = part.trim();
-          if (!trimmed) {
-            continue;
-          }
-
-          let payload = trimmed;
-          if (payload.startsWith("data: ")) {
-            payload = payload.slice(6).trim();
-          } else if (payload.startsWith("data:")) {
-            payload = payload.slice(5).trim();
-          }
-
-          if (!payload) {
-            continue;
-          }
-
-          try {
-            const event: PipelineEvent = JSON.parse(payload);
-            switch (event.kind) {
-              case "budget":
-                setBudget({ spent: event.spent, limit: event.budget });
-                break;
-
-              case "cell_started":
-                setProbes((prev) =>
-                  prev.includes(event.probeId) ? prev : [...prev, event.probeId]
-                );
-                setLocales((prev) =>
-                  prev.includes(event.localeId)
-                    ? prev
-                    : [...prev, event.localeId]
-                );
-                setCellStates((prev) => {
-                  const next = new Map(prev);
-                  next.set(`${event.probeId}::${event.localeId}`, "running");
-                  return next;
-                });
-                break;
-
-              case "cell_done":
-                setProbes((prev) =>
-                  prev.includes(event.probeId) ? prev : [...prev, event.probeId]
-                );
-                setLocales((prev) =>
-                  prev.includes(event.localeId)
-                    ? prev
-                    : [...prev, event.localeId]
-                );
-                setCellStates((prev) => {
-                  const next = new Map(prev);
-                  const status: CellStatus = event.suppressed
-                    ? "suppressed"
-                    : "done";
-                  next.set(`${event.probeId}::${event.localeId}`, status);
-                  return next;
-                });
-                break;
-
-              case "claim_adjudicated":
-                setVerdictCounts((prev) => ({
-                  ...prev,
-                  [event.verdict]: (prev[event.verdict] ?? 0) + 1,
-                }));
-                break;
-
-              case "log":
-                if (event.line === "__DONE__") {
-                  isDone = true;
-                  await reader.cancel();
-                } else {
-                  setLogLines((prev) => [...prev, event.line]);
-                }
-                break;
-
-              case "error":
-                setError(event.message);
-                break;
-
-              case "probes": {
-                // Row order is fixed here, before any cell arrives, so rows do
-                // not reshuffle as results stream in.
-                setProbes(event.probes.map((pr) => pr.id));
-                setProbeQueries(
-                  new Map(event.probes.map((pr) => [pr.id, pr.query])),
-                );
-                break;
-              }
-
-              case "audit_state":
-                break;
-            }
-          } catch {
-            // Drop unparseable payload chunks
-          }
-
-          if (isDone) {
-            break;
-          }
-        }
-      }
+      await consumeStream(res);
     } catch (err: unknown) {
       if (err instanceof DOMException && err.name === "AbortError") {
         return;
@@ -285,14 +346,42 @@ export function DepositionGrid() {
           disabled={running || !entity.trim()}
           className="bg-accent text-accent-ink px-4 py-2 rounded disabled:opacity-50 font-medium whitespace-nowrap transition-opacity"
         >
-          {running ? "Deposing…" : "Depose"}
+          {running && mode === "live" ? "Deposing…" : "Depose"}
+        </button>
+        <button
+          type="button"
+          onClick={handleReplay}
+          disabled={running}
+          className="bg-surface border border-rule px-4 py-2 rounded disabled:opacity-50 font-medium whitespace-nowrap transition-opacity"
+        >
+          {running && mode === "replay" ? "Replaying…" : "Replay recorded audit"}
         </button>
       </form>
+
+      {/* LIVE DISABLED NOTICE */}
+      {liveDisabled && (
+        <div className="bg-warn-soft text-warn border border-warn p-3 rounded text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <span>
+            Live audits are off on this deployment so it cannot spend search quota.
+            The replay shows a real recorded audit instead.
+          </span>
+          <button
+            type="button"
+            onClick={handleReplay}
+            disabled={running}
+            className="bg-surface border border-rule px-3 py-1.5 rounded font-medium whitespace-nowrap disabled:opacity-50 transition-opacity self-start sm:self-auto"
+          >
+            {running && mode === "replay"
+              ? "Replaying…"
+              : "Replay recorded audit"}
+          </button>
+        </div>
+      )}
 
       {/* 2. BUDGET BAR */}
       <div className="flex flex-col gap-1.5 w-full">
         <div className="meta text-xs text-muted">
-          SEARCHES {budget.spent} / {budget.limit}
+          {mode === "replay" ? "RECORDED SEARCHES" : "SEARCHES"} {budget.spent} / {budget.limit}
         </div>
         <div className="w-full bg-surface-3 h-[3px] rounded-full overflow-hidden">
           <div
@@ -304,6 +393,15 @@ export function DepositionGrid() {
 
       {/* 3. GRID */}
       <div className="flex flex-col gap-3">
+        {mode === "replay" && (
+          <div className="flex items-center gap-2 text-xs text-muted">
+            <span className="bg-warn-soft text-warn border border-warn font-mono text-xs px-1.5 py-0.5 rounded font-medium">
+              REPLAY
+            </span>
+            <span>Streaming a recorded audit. No live searches are performed.</span>
+          </div>
+        )}
+
         <div className="scroll-x w-full">
           {locales.length > 0 && probes.length > 0 ? (
             <div
