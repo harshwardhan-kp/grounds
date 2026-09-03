@@ -2,6 +2,7 @@
 
 import { useState, useId, useMemo } from "react";
 import type { Reference } from "@/lib/types";
+import { Bracket, Marker, DataRow } from "@/components/ui";
 
 export interface ForensicInspectorProps {
   observationId: string;
@@ -134,27 +135,28 @@ export function ForensicInspector({
   };
 
   return (
-    <div className="w-full font-sans text-xs">
+    <div className="w-full text-xs">
       <button
         type="button"
         aria-expanded={isOpen}
         aria-controls={panelId}
         onClick={() => setIsOpen((prev) => !prev)}
-        className="font-mono text-xs px-2 py-1 rounded border border-rule bg-surface-2 text-ink hover:border-accent transition-colors"
+        className="mono lowercase text-xs px-3 py-1.5 rounded-[3px] border border-rule bg-surface-2 text-ink hover:bg-surface-3 transition-colors inline-flex items-center gap-1.5"
       >
-        Inspect SerpApi trace
+        <span>inspect serpapi trace</span>
+        <Bracket tone="muted">{isOpen ? "close" : "open"}</Bracket>
       </button>
 
       {isOpen && (
         <div
           id={panelId}
-          className="mt-2 border border-rule rounded bg-surface p-4 text-ink shadow-sm"
+          className="mt-3 border border-rule rounded-[3px] bg-surface p-4 text-ink flex flex-col gap-4"
         >
           {/* Tab Navigation */}
           <div
             role="tablist"
             aria-label="Forensic Inspector Tabs"
-            className="flex gap-4 border-b border-rule mb-4"
+            className="flex gap-4 border-b border-rule"
           >
             <button
               type="button"
@@ -163,13 +165,13 @@ export function ForensicInspector({
               aria-selected={activeTab === "parsed"}
               aria-controls={panelParsedId}
               onClick={() => setActiveTab("parsed")}
-              className={`pb-2 font-mono text-xs transition-colors ${
+              className={`pb-2 mono text-xs transition-colors ${
                 activeTab === "parsed"
-                  ? "border-b-2 border-accent text-ink font-medium"
+                  ? "border-b-2 border-ink text-ink font-medium"
                   : "text-muted hover:text-ink"
               }`}
             >
-              Parsed response
+              parsed response
             </button>
             <button
               type="button"
@@ -178,13 +180,13 @@ export function ForensicInspector({
               aria-selected={activeTab === "archive"}
               aria-controls={panelArchiveId}
               onClick={() => setActiveTab("archive")}
-              className={`pb-2 font-mono text-xs transition-colors ${
+              className={`pb-2 mono text-xs transition-colors ${
                 activeTab === "archive"
-                  ? "border-b-2 border-accent text-ink font-medium"
+                  ? "border-b-2 border-ink text-ink font-medium"
                   : "text-muted hover:text-ink"
               }`}
             >
-              Archive verification
+              archive verification
             </button>
             <button
               type="button"
@@ -193,13 +195,13 @@ export function ForensicInspector({
               aria-selected={activeTab === "request"}
               aria-controls={panelRequestId}
               onClick={() => setActiveTab("request")}
-              className={`pb-2 font-mono text-xs transition-colors ${
+              className={`pb-2 mono text-xs transition-colors ${
                 activeTab === "request"
-                  ? "border-b-2 border-accent text-ink font-medium"
+                  ? "border-b-2 border-ink text-ink font-medium"
                   : "text-muted hover:text-ink"
               }`}
             >
-              Request
+              request
             </button>
           </div>
 
@@ -211,17 +213,23 @@ export function ForensicInspector({
             hidden={activeTab !== "parsed"}
           >
             {activeTab === "parsed" && (
-              <div className="space-y-4">
-                <div className="meta text-muted">
-                  {textBlocks.length} text blocks · {references.length} references · suppressed{" "}
-                  {suppressed ? "yes" : "no"}
+              <div className="flex flex-col gap-4">
+                <div className="meta text-muted flex items-center gap-2">
+                  <Bracket tone="muted">summary</Bracket>
+                  <span>
+                    {textBlocks.length} text blocks · {references.length} references · suppressed{" "}
+                    {suppressed ? "yes" : "no"}
+                  </span>
                 </div>
 
                 {suppressed ? (
-                  <div className="border border-rule rounded bg-surface-2 p-3 space-y-1">
-                    <p className="font-medium text-ink">
-                      Google returned no generative answer for this probe.
-                    </p>
+                  <div className="border border-rule rounded-[3px] bg-surface-2 p-3 flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <Bracket tone="muted">suppressed</Bracket>
+                      <p className="font-medium text-ink">
+                        Google returned no generative answer for this probe.
+                      </p>
+                    </div>
                     <p className="meta text-muted">
                       This suppression is recorded as an observation, not an error. Google withholds
                       AI Overviews on adverse or sensitive queries.
@@ -229,26 +237,26 @@ export function ForensicInspector({
                   </div>
                 ) : (
                   <>
-                    <div>
-                      <div className="meta text-muted uppercase tracking-wider mb-2">
-                        Text Blocks
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        <Bracket tone="muted">text blocks</Bracket>
+                        <span className="meta text-muted tabular">({textBlocks.length})</span>
                       </div>
                       {textBlocks.length === 0 ? (
                         <p className="meta text-muted">No text blocks recorded in response.</p>
                       ) : (
-                        <ol className="list-decimal list-inside space-y-2">
+                        <ol className="divide-y divide-rule border-y border-rule">
                           {textBlocks.map((block, idx) => {
                             const isLong = block.snippet.length > 240;
                             const text = isLong
                               ? `${block.snippet.slice(0, 240)}…`
                               : block.snippet;
                             return (
-                              <li
-                                key={idx}
-                                className="border-b border-rule pb-2 last:border-b-0"
-                              >
-                                <span className="meta text-muted mr-2">[{block.type}]</span>
-                                <span className="testimony">{text}</span>
+                              <li key={idx} className="py-2 flex items-baseline gap-2">
+                                <span className="shrink-0">
+                                  <Bracket tone="muted">{block.type}</Bracket>
+                                </span>
+                                <span className="testimony text-ink">{text}</span>
                               </li>
                             );
                           })}
@@ -256,36 +264,39 @@ export function ForensicInspector({
                       )}
                     </div>
 
-                    <div>
-                      <div className="meta text-muted uppercase tracking-wider mb-2">
-                        References
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        <Bracket tone="muted">references</Bracket>
+                        <span className="meta text-muted tabular">({references.length})</span>
                       </div>
                       {references.length === 0 ? (
                         <p className="meta text-muted">No cited references recorded.</p>
                       ) : (
-                        <ul className="space-y-2">
+                        <ul className="flex flex-col gap-2">
                           {references.map((ref) => (
                             <li
                               key={ref.index}
-                              className="border border-rule rounded bg-surface-2 p-2.5 space-y-1"
+                              className="border border-rule rounded-[3px] bg-surface-2 p-2.5 flex flex-col gap-1"
                             >
                               <div className="flex items-baseline gap-2">
-                                <span className="meta font-mono text-muted">[{ref.index}]</span>
+                                <Bracket tone="muted">{String(ref.index)}</Bracket>
                                 <a
                                   href={ref.link}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-ink underline hover:text-accent font-medium break-all"
+                                  className="text-ink underline hover:text-muted font-medium break-all"
                                 >
                                   {ref.title || ref.link}
                                 </a>
                               </div>
                               {ref.source && (
-                                <div className="meta text-muted">Source: {ref.source}</div>
+                                <div className="meta text-muted">
+                                  source: <span className="text-ink">{ref.source}</span>
+                                </div>
                               )}
                               {ref.snippet && (
                                 <div className="testimony text-muted italic">
-                                  {ref.snippet}
+                                  "{ref.snippet}"
                                 </div>
                               )}
                             </li>
@@ -307,62 +318,60 @@ export function ForensicInspector({
             hidden={activeTab !== "archive"}
           >
             {activeTab === "archive" && (
-              <div className="space-y-4">
-                <div>
-                  <div className="meta text-muted uppercase tracking-wider mb-1">
-                    SerpApi Search ID
-                  </div>
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <Bracket tone="muted">serpapi search id</Bracket>
                   {searchId ? (
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-ink">{searchId}</span>
+                      <span className="mono text-ink text-xs">{searchId}</span>
                       <a
                         href={`https://serpapi.com/searches/${searchId}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-ink underline hover:text-accent"
+                        className="mono text-xs text-ink underline hover:text-muted"
                       >
-                        Open SerpApi archive record
+                        open serpapi archive record
                       </a>
                     </div>
                   ) : (
                     <div className="meta text-muted">
-                      <span className="font-mono">null</span> — This observation has no archive
-                      record.
+                      <span className="mono">null</span> — this observation has no archive record.
                     </div>
                   )}
                 </div>
 
-                <div>
-                  <div className="meta text-muted uppercase tracking-wider mb-1">
-                    Stored SHA-256 Payload Hash
-                  </div>
-                  <div className="font-mono text-xs break-all bg-surface-2 p-2.5 border border-rule rounded select-all text-ink">
-                    {payloadHash}
+                <div className="flex flex-col gap-1.5">
+                  <Bracket tone="muted">stored sha-256 payload hash</Bracket>
+                  <div className="scroll-x">
+                    <div className="mono text-xs break-all bg-surface-2 p-2.5 border border-rule rounded-[3px] select-all text-ink">
+                      {payloadHash}
+                    </div>
                   </div>
                 </div>
 
-                <div className="pt-2">
+                <div className="pt-2 flex flex-col gap-3">
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
                       disabled={!searchId || isVerifying}
                       onClick={handleVerify}
-                      className="font-mono text-xs px-3 py-1.5 rounded border border-rule bg-surface-2 text-ink hover:border-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      className="mono lowercase text-xs px-3 py-1.5 rounded-[3px] border border-rule bg-surface-2 text-ink hover:bg-surface-3 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
-                      {isVerifying ? "Verifying…" : "Verify against archive"}
+                      {isVerifying ? "verifying…" : "verify against archive"}
                     </button>
 
                     {verifyResult && (
                       <div className="flex items-center gap-2">
                         <span
-                          className={`font-mono text-xs px-2 py-0.5 rounded font-medium ${
-                            verifyResult.outcome === "MATCH"
-                              ? "bg-ok-soft text-ok"
-                              : verifyResult.outcome === "MISMATCH"
-                              ? "bg-critical-soft text-critical"
-                              : "bg-warn-soft text-warn"
+                          className={`mono text-xs px-2 py-0.5 rounded-[3px] font-medium inline-flex items-center gap-1.5 ${
+                            verifyResult.outcome === "MISMATCH"
+                              ? "bg-red-soft text-red border border-red-rule"
+                              : verifyResult.outcome === "MATCH"
+                              ? "bg-surface-2 text-ink border border-rule"
+                              : "bg-surface-2 text-muted border border-rule"
                           }`}
                         >
+                          {verifyResult.outcome === "MISMATCH" && <Marker tone="red" />}
                           {verifyResult.outcome}
                         </span>
                         {verifyResult.message && (
@@ -373,13 +382,13 @@ export function ForensicInspector({
                   </div>
 
                   {!searchId && (
-                    <p className="meta text-muted mt-2">
+                    <p className="meta text-muted">
                       Verification requires an active third-party search record. This observation
                       does not have a registered SerpApi searchId.
                     </p>
                   )}
 
-                  <p className="meta text-muted mt-3">
+                  <p className="meta text-muted">
                     SerpApi retains archived searches for 31 days, so the local payload hash is the
                     durable record and the archive is third-party corroboration.
                   </p>
@@ -396,46 +405,45 @@ export function ForensicInspector({
             hidden={activeTab !== "request"}
           >
             {activeTab === "request" && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4 pb-3 border-b border-rule">
-                  <div>
-                    <div className="meta text-muted uppercase tracking-wider mb-1">
-                      Captured At
-                    </div>
-                    <div className="font-mono text-ink">{formatCapturedAt(capturedAt)}</div>
-                  </div>
-                  <div>
-                    <div className="meta text-muted uppercase tracking-wider mb-1">Latency</div>
-                    <div className="tabular font-mono text-ink">{latencyMs} ms</div>
-                  </div>
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2 pb-3 border-b border-rule">
+                  <DataRow
+                    label="captured_at"
+                    value={formatCapturedAt(capturedAt)}
+                    mono
+                  />
+                  <DataRow
+                    label="latency"
+                    value={<span className="tabular">{latencyMs} ms</span>}
+                    mono
+                  />
                 </div>
 
-                <div>
-                  <div className="meta text-muted uppercase tracking-wider mb-2">
-                    Request Parameters
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2">
+                    <Bracket tone="muted">request parameters</Bracket>
+                    <span className="meta text-muted tabular">({Object.keys(params).length})</span>
                   </div>
-                  <dl className="space-y-1.5 border border-rule rounded bg-surface-2 p-3">
+                  <dl className="border border-rule rounded-[3px] bg-surface-2 divide-y divide-rule">
                     {Object.entries(params).length === 0 ? (
-                      <div className="meta text-muted">No request parameters recorded.</div>
+                      <div className="p-3 meta text-muted">No request parameters recorded.</div>
                     ) : (
                       Object.entries(params).map(([key, value]) => {
                         const isGeo = GEO_PARAM_KEYS.has(key);
                         return (
                           <div
                             key={key}
-                            className={`flex items-baseline justify-between py-1 px-1.5 rounded ${
-                              isGeo ? "bg-surface border-l-2 border-accent" : ""
+                            className={`flex items-baseline justify-between py-1.5 px-3 ${
+                              isGeo ? "bg-surface" : ""
                             }`}
                           >
                             <dt className="meta text-muted flex items-center gap-1.5">
-                              <span>{key}</span>
+                              <span className="mono">{key}</span>
                               {isGeo && (
-                                <span className="meta text-[10px] text-accent border border-rule px-1 rounded uppercase">
-                                  geo
-                                </span>
+                                <Bracket tone="ink" className="text-[10px]">geo</Bracket>
                               )}
                             </dt>
-                            <dd className="font-mono text-ink text-right ml-4 break-all">
+                            <dd className="mono text-ink text-right ml-4 break-all">
                               {value}
                             </dd>
                           </div>
@@ -445,21 +453,19 @@ export function ForensicInspector({
                   </dl>
                 </div>
 
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="meta text-muted uppercase tracking-wider">
-                      cURL Reconstruction
-                    </div>
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between">
+                    <Bracket tone="muted">curl reconstruction</Bracket>
                     <button
                       type="button"
                       onClick={handleCopyCurl}
-                      className="meta text-muted hover:text-ink font-mono underline"
+                      className="meta mono text-muted hover:text-ink underline transition-colors"
                     >
-                      {hasCopiedCurl ? "Copied" : "Copy"}
+                      {hasCopiedCurl ? "[copied]" : "[copy]"}
                     </button>
                   </div>
                   <div className="scroll-x">
-                    <pre className="font-mono text-xs p-3 bg-surface-2 border border-rule rounded text-ink whitespace-pre">
+                    <pre className="mono text-xs p-3 bg-surface-2 border border-rule rounded-[3px] text-ink whitespace-pre">
                       {curlCommand}
                     </pre>
                   </div>

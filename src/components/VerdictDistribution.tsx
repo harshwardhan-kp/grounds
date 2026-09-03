@@ -34,9 +34,9 @@ function familyOf(verdict: Verdict): Family {
 }
 
 const FAMILY_FILL: Record<Family, string> = {
-  supported: "bg-ok",
-  defect: "bg-critical",
-  excluded: "bg-neutral",
+  supported: "bg-ink",
+  defect: "bg-red",
+  excluded: "bg-surface-3",
 };
 
 const FAMILY_LABEL: Record<Family, string> = {
@@ -56,7 +56,7 @@ export function VerdictDistribution({
 
   if (total === 0) {
     return (
-      <div className="border border-rule bg-surface p-6 text-sm text-muted">
+      <div className="border border-rule bg-surface p-5 sm:p-6 text-sm text-muted">
         No clusters were adjudicated in this audit, so there is no distribution
         to report.
       </div>
@@ -75,10 +75,10 @@ export function VerdictDistribution({
   const maxCount = Math.max(...present.map((v) => byVerdict.get(v) ?? 0));
 
   return (
-    <div className="border border-rule bg-surface p-5 sm:p-6 flex flex-col gap-5">
+    <div className="border border-rule bg-surface p-5 sm:p-6 flex flex-col gap-6">
       {/* Three-way split. Adding these together would be the wrong reading. */}
-      <div className="flex flex-col gap-2">
-        <div className="flex h-2.5 w-full overflow-hidden border border-rule">
+      <div className="flex flex-col gap-2.5">
+        <div className="flex h-2.5 w-full overflow-hidden border border-rule bg-surface-2">
           {FAMILY_ORDER.map((family) => {
             const count = byFamily.get(family) ?? 0;
             if (count === 0) return null;
@@ -92,14 +92,17 @@ export function VerdictDistribution({
             );
           })}
         </div>
-        <div className="flex flex-wrap gap-x-6 gap-y-1.5">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-1.5">
           {FAMILY_ORDER.map((family) => {
             const count = byFamily.get(family) ?? 0;
             if (count === 0) return null;
             return (
               <span key={family} className="inline-flex items-center gap-2">
                 <span
-                  className={`inline-block h-2.5 w-2.5 ${FAMILY_FILL[family]}`}
+                  className={`inline-block h-2 w-2 shrink-0 ${FAMILY_FILL[family]} ${
+                    family === "excluded" ? "border border-rule" : ""
+                  }`}
+                  aria-hidden="true"
                 />
                 <span className="meta text-muted">
                   {FAMILY_LABEL[family]}
@@ -120,13 +123,13 @@ export function VerdictDistribution({
               key={verdict}
               className="flex items-center gap-4 py-2.5"
             >
-              <dt className="w-32 shrink-0">
+              <dt className="w-32 sm:w-36 shrink-0">
                 <VerdictChip verdict={verdict} size="sm" />
               </dt>
               <dd className="flex flex-1 items-center gap-3">
-                <span className="flex h-1.5 flex-1 min-w-16">
+                <span className="flex h-1.5 flex-1 min-w-16 overflow-hidden bg-surface-2">
                   <span
-                    className={FAMILY_FILL[familyOf(verdict)]}
+                    className={`h-full ${FAMILY_FILL[familyOf(verdict)]}`}
                     style={{ width: `${(count / maxCount) * 100}%` }}
                   />
                 </span>

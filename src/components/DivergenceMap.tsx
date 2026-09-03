@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+import { Bracket } from "@/components/ui";
 import { VerdictChip } from "@/components/Verdict";
 import { isDefect, type ClaimCluster, type Locale } from "@/lib/types";
 
@@ -22,12 +24,12 @@ function presenceIn(cluster: ClaimCluster, localeId: string): Presence {
 }
 
 const CELL_STYLES: Record<Presence, string> = {
-  observed: "bg-accent-soft border-accent",
+  observed: "bg-surface-3 border-rule-strong",
   absent: "bg-surface-2 border-rule",
-  "not-sampled": "border-rule border-dashed",
+  "not-sampled": "bg-ground border-rule border-dashed",
 };
 
-const DEFECT_CELL = "bg-critical-soft border-critical";
+const DEFECT_CELL = "bg-red-soft border-red-rule";
 
 const CELL_LABEL: Record<Presence, string> = {
   observed: "observed",
@@ -44,8 +46,8 @@ function Cell({
   defect: boolean;
   label: string;
 }) {
-  const style =
-    presence === "observed" && defect ? DEFECT_CELL : CELL_STYLES[presence];
+  const isDefectCell = presence === "observed" && defect;
+  const style = isDefectCell ? DEFECT_CELL : CELL_STYLES[presence];
   return (
     <span
       title={label}
@@ -60,12 +62,15 @@ function LegendKey({
   children,
 }: {
   className: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
-    <span className="inline-flex items-center gap-1.5">
-      <span className={`inline-block h-3 w-4 border ${className}`} />
-      <span className="meta text-muted">{children}</span>
+    <span className="inline-flex items-center gap-2">
+      <span
+        className={`inline-block h-3 w-4 shrink-0 border ${className}`}
+        aria-hidden="true"
+      />
+      <span className="meta text-xs text-muted">{children}</span>
     </span>
   );
 }
@@ -100,20 +105,20 @@ export function DivergenceMap({
         <table className="w-full border-collapse text-left text-sm">
           <thead>
             <tr className="border-b border-rule">
-              <th className="meta p-3 font-normal align-bottom min-w-[18rem]">
-                Assertion
+              <th className="p-3 font-normal align-bottom min-w-[18rem]">
+                <Bracket tone="muted">assertion</Bracket>
               </th>
               {locales.map((locale) => (
                 <th
                   key={locale.id}
-                  className="meta p-3 font-normal align-bottom whitespace-nowrap"
+                  className="p-3 font-normal align-bottom whitespace-nowrap"
                   title={locale.location}
                 >
-                  {locale.label}
+                  <Bracket tone="muted">{locale.label.toLowerCase()}</Bracket>
                 </th>
               ))}
-              <th className="meta p-3 font-normal align-bottom whitespace-nowrap text-right">
-                Seen in
+              <th className="p-3 font-normal align-bottom whitespace-nowrap text-right">
+                <Bracket tone="muted">seen in</Bracket>
               </th>
             </tr>
           </thead>
@@ -125,26 +130,31 @@ export function DivergenceMap({
                 <tr key={cluster.id} className="border-b border-rule last:border-b-0">
                   <td className="p-3 align-middle">
                     <div className="flex flex-col gap-1.5">
-                      <VerdictChip verdict={cluster.verdict} size="sm" />
-                      <span className="text-xs leading-snug text-muted max-w-[26rem]">
+                      <div>
+                        <VerdictChip verdict={cluster.verdict} size="sm" />
+                      </div>
+                      <span className="testimony text-xs leading-snug text-ink max-w-[26rem]">
                         {cluster.canonicalText}
                       </span>
                     </div>
                   </td>
                   {locales.map((locale) => {
                     const presence = presenceIn(cluster, locale.id);
+                    const isDefectCell = presence === "observed" && defect;
                     return (
                       <td key={locale.id} className="p-3 align-middle">
                         <Cell
                           presence={presence}
                           defect={defect}
-                          label={`${locale.label}: ${CELL_LABEL[presence]}`}
+                          label={`${locale.label}: ${
+                            isDefectCell ? "observed, defect" : CELL_LABEL[presence]
+                          }`}
                         />
                       </td>
                     );
                   })}
                   <td className="p-3 align-middle text-right">
-                    <span className="tabular text-xs text-muted">
+                    <span className="tabular mono text-xs text-muted">
                       {observedCount}/{locales.length}
                     </span>
                   </td>
@@ -156,12 +166,14 @@ export function DivergenceMap({
       </div>
 
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-        <LegendKey className={DEFECT_CELL}>Observed, defect</LegendKey>
-        <LegendKey className={CELL_STYLES.observed}>Observed</LegendKey>
-        <LegendKey className={CELL_STYLES.absent}>
-          Sampled, did not appear
+        <LegendKey className={DEFECT_CELL}>
+          <span className="text-red">observed, defect</span>
         </LegendKey>
-        <LegendKey className={CELL_STYLES["not-sampled"]}>Not sampled</LegendKey>
+        <LegendKey className={CELL_STYLES.observed}>observed</LegendKey>
+        <LegendKey className={CELL_STYLES.absent}>
+          sampled, did not appear
+        </LegendKey>
+        <LegendKey className={CELL_STYLES["not-sampled"]}>not sampled</LegendKey>
       </div>
     </div>
   );

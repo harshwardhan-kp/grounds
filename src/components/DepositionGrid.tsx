@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useRef, useState } from "react";
+import { Bracket, PillButton } from "@/components/ui";
 import { VerdictChip } from "@/components/Verdict";
 import { localeLabel } from "@/lib/locales";
 import type { PipelineEvent, Verdict } from "@/lib/types";
@@ -21,16 +22,16 @@ const ALL_VERDICTS: Verdict[] = [
 function getCellBgClass(status: CellStatus): string {
   switch (status) {
     case "running":
-      return "bg-accent-soft motion-safe:animate-pulse";
+      return "bg-surface-3 border-rule-strong motion-safe:animate-pulse text-ink";
     case "done":
-      return "bg-ok-soft";
+      return "bg-surface-2 border-rule text-ink";
     case "suppressed":
-      return "bg-warn-soft";
+      return "bg-surface border-rule border-dashed text-muted";
     case "error":
-      return "bg-critical-soft";
+      return "bg-red-soft border-red-rule text-red";
     case "pending":
     default:
-      return "bg-surface-3";
+      return "bg-ground border-rule text-faint";
   }
 }
 
@@ -44,7 +45,9 @@ export function DepositionGrid() {
     new Map()
   );
   const [probes, setProbes] = useState<string[]>([]);
-  const [probeQueries, setProbeQueries] = useState<Map<string, string>>(new Map());
+  const [probeQueries, setProbeQueries] = useState<Map<string, string>>(
+    new Map()
+  );
   const [locales, setLocales] = useState<string[]>([]);
   const [budget, setBudget] = useState<{ spent: number; limit: number }>({
     spent: 0,
@@ -84,7 +87,10 @@ export function DepositionGrid() {
 
   const budgetPercent =
     budget.limit > 0
-      ? Math.min(100, Math.max(0, Math.round((budget.spent / budget.limit) * 100)))
+      ? Math.min(
+          100,
+          Math.max(0, Math.round((budget.spent / budget.limit) * 100))
+        )
       : 0;
 
   function resetRunState() {
@@ -211,7 +217,7 @@ export function DepositionGrid() {
               // not reshuffle as results stream in.
               setProbes(event.probes.map((pr) => pr.id));
               setProbeQueries(
-                new Map(event.probes.map((pr) => [pr.id, pr.query])),
+                new Map(event.probes.map((pr) => [pr.id, pr.query]))
               );
               break;
             }
@@ -271,7 +277,7 @@ export function DepositionGrid() {
         }
 
         throw new Error(
-          detail?.error ?? `Audit request failed with status ${res.status}`,
+          detail?.error ?? `Audit request failed with status ${res.status}`
         );
       }
 
@@ -312,7 +318,7 @@ export function DepositionGrid() {
           error?: string;
         } | null;
         throw new Error(
-          detail?.error ?? `Replay request failed with status ${res.status}`,
+          detail?.error ?? `Replay request failed with status ${res.status}`
         );
       }
 
@@ -332,60 +338,71 @@ export function DepositionGrid() {
   return (
     <div className="w-full max-w-[1100px] mx-auto flex flex-col gap-6">
       {/* 1. CONTROL ROW */}
-      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 w-full">
+      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2.5 w-full">
         <input
           type="text"
           value={entity}
           onChange={(e) => setEntity(e.target.value)}
-          placeholder="Company or organisation name"
+          placeholder="company or organisation name"
           disabled={running}
-          className="bg-surface border border-rule rounded px-3 py-2 w-full flex-1 focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-50"
+          className="bg-surface border border-rule rounded-[3px] px-3 py-2 w-full flex-1 text-ink text-sm placeholder:text-faint focus:outline-none focus:border-rule-strong disabled:opacity-40 transition-colors"
         />
-        <button
+        <PillButton
           type="submit"
+          variant="primary"
           disabled={running || !entity.trim()}
-          className="bg-accent text-accent-ink px-4 py-2 rounded disabled:opacity-50 font-medium whitespace-nowrap transition-opacity"
+          className="whitespace-nowrap"
         >
-          {running && mode === "live" ? "Deposing…" : "Depose"}
-        </button>
-        <button
+          {running && mode === "live" ? "deposing…" : "depose"}
+        </PillButton>
+        <PillButton
           type="button"
+          variant="secondary"
           onClick={handleReplay}
           disabled={running}
-          className="bg-surface border border-rule px-4 py-2 rounded disabled:opacity-50 font-medium whitespace-nowrap transition-opacity"
+          className="whitespace-nowrap"
         >
-          {running && mode === "replay" ? "Replaying…" : "Replay recorded audit"}
-        </button>
+          {running && mode === "replay" ? "replaying…" : "replay recorded audit"}
+        </PillButton>
       </form>
 
       {/* LIVE DISABLED NOTICE */}
       {liveDisabled && (
-        <div className="bg-warn-soft text-warn border border-warn p-3 rounded text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <span>
-            Live audits are off on this deployment so it cannot spend search quota.
-            The replay shows a real recorded audit instead.
-          </span>
-          <button
+        <div className="bg-surface-2 border border-rule p-3.5 rounded-[3px] text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start gap-2.5">
+            <Bracket tone="muted">notice</Bracket>
+            <span className="text-muted leading-relaxed">
+              Live audits are off on this deployment so it cannot spend search quota.
+              The replay shows a real recorded audit instead.
+            </span>
+          </div>
+          <PillButton
             type="button"
+            variant="secondary"
             onClick={handleReplay}
             disabled={running}
-            className="bg-surface border border-rule px-3 py-1.5 rounded font-medium whitespace-nowrap disabled:opacity-50 transition-opacity self-start sm:self-auto"
+            className="self-start sm:self-auto shrink-0 whitespace-nowrap"
           >
             {running && mode === "replay"
-              ? "Replaying…"
-              : "Replay recorded audit"}
-          </button>
+              ? "replaying…"
+              : "replay recorded audit"}
+          </PillButton>
         </div>
       )}
 
       {/* 2. BUDGET BAR */}
       <div className="flex flex-col gap-1.5 w-full">
-        <div className="meta text-xs text-muted">
-          {mode === "replay" ? "RECORDED SEARCHES" : "SEARCHES"} {budget.spent} / {budget.limit}
+        <div className="flex items-baseline justify-between text-xs">
+          <Bracket tone="muted">
+            {mode === "replay" ? "recorded searches" : "searches"}
+          </Bracket>
+          <span className="tabular font-mono text-xs text-muted">
+            <span className="text-ink">{budget.spent}</span> / {budget.limit}
+          </span>
         </div>
-        <div className="w-full bg-surface-3 h-[3px] rounded-full overflow-hidden">
+        <div className="w-full bg-surface-2 h-[2px] overflow-hidden rounded-[1px]">
           <div
-            className="bg-accent h-full transition-all duration-300"
+            className="bg-ink h-full transition-all duration-300"
             style={{ width: `${budgetPercent}%` }}
           />
         </div>
@@ -394,10 +411,8 @@ export function DepositionGrid() {
       {/* 3. GRID */}
       <div className="flex flex-col gap-3">
         {mode === "replay" && (
-          <div className="flex items-center gap-2 text-xs text-muted">
-            <span className="bg-warn-soft text-warn border border-warn font-mono text-xs px-1.5 py-0.5 rounded font-medium">
-              REPLAY
-            </span>
+          <div className="flex items-baseline gap-2 text-xs text-muted">
+            <Bracket tone="ink">replay</Bracket>
             <span>Streaming a recorded audit. No live searches are performed.</span>
           </div>
         )}
@@ -405,9 +420,9 @@ export function DepositionGrid() {
         <div className="scroll-x w-full">
           {locales.length > 0 && probes.length > 0 ? (
             <div
-              className="grid gap-2 w-max"
+              className="grid gap-1.5 w-max"
               style={{
-                gridTemplateColumns: `minmax(0, 260px) repeat(${locales.length}, minmax(104px, 1fr))`,
+                gridTemplateColumns: `minmax(0, 280px) repeat(${locales.length}, minmax(104px, 1fr))`,
               }}
               role="grid"
               aria-label="Deposition grid"
@@ -416,43 +431,56 @@ export function DepositionGrid() {
               {locales.map((localeId) => (
                 <div
                   key={localeId}
-                  className="meta text-center px-1 truncate"
+                  className="text-center px-1 truncate"
                   title={localeLabel(localeId)}
                 >
-                  {localeLabel(localeId)}
+                  <Bracket tone="muted">{localeLabel(localeId).toLowerCase()}</Bracket>
                 </div>
               ))}
 
               {probes.map((probeId) => (
                 <Fragment key={probeId}>
-                <div
-                  className="pr-3 text-right text-sm text-muted truncate max-w-[280px]"
-                  title={probeQueries.get(probeId) ?? probeId}
-                >
-                  {probeQueries.get(probeId) ?? probeId}
-                </div>
-                {locales.map((localeId) => {
-                  const key = `${probeId}::${localeId}`;
-                  const status = cellStates.get(key) ?? "pending";
-                  const desc = `${probeQueries.get(probeId) ?? probeId} — ${localeLabel(localeId)} — ${status}`;
-                  return (
-                    <div
-                      key={key}
-                      title={desc}
-                      aria-label={desc}
-                      role="gridcell"
-                      className={`h-[38px] w-full rounded border border-rule transition-colors ${getCellBgClass(
-                        status
-                      )}`}
-                    />
-                  );
-                })}
+                  <div
+                    className="pr-3 text-right text-xs text-muted truncate max-w-[280px] mono self-center"
+                    title={probeQueries.get(probeId) ?? probeId}
+                  >
+                    {probeQueries.get(probeId) ?? probeId}
+                  </div>
+                  {locales.map((localeId) => {
+                    const key = `${probeId}::${localeId}`;
+                    const status = cellStates.get(key) ?? "pending";
+                    const desc = `${probeQueries.get(probeId) ?? probeId} — ${localeLabel(localeId)} — ${status}`;
+                    return (
+                      <div
+                        key={key}
+                        title={desc}
+                        aria-label={desc}
+                        role="gridcell"
+                        className={`h-[38px] w-full rounded-[2px] border transition-colors flex items-center justify-center px-1 text-center ${getCellBgClass(
+                          status
+                        )}`}
+                      >
+                        <span className="mono text-[11px] leading-none select-none truncate">
+                          {status === "pending"
+                            ? "—"
+                            : status === "running"
+                              ? "deposing…"
+                              : status === "done"
+                                ? "done"
+                                : status === "suppressed"
+                                  ? "suppressed"
+                                  : "error"}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </Fragment>
               ))}
             </div>
           ) : (
-            <div className="py-8 text-center text-muted border border-rule rounded bg-surface text-sm">
-              Grid will populate as deposition proceeds.
+            <div className="py-12 text-center text-muted border border-rule rounded-[3px] bg-surface text-xs mono">
+              <Bracket tone="muted">pending</Bracket>{" "}
+              <span className="text-muted">grid will populate as deposition proceeds.</span>
             </div>
           )}
         </div>
@@ -461,53 +489,53 @@ export function DepositionGrid() {
         <div className="flex flex-wrap items-center gap-4 text-xs text-muted">
           <div className="flex items-center gap-1.5">
             <span
-              className="w-3.5 h-3.5 rounded bg-surface-3 inline-block"
+              className="w-3.5 h-3.5 rounded-[2px] bg-ground border border-rule inline-block"
               aria-hidden="true"
             />
-            <span>Pending</span>
+            <span className="mono lowercase">pending</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span
-              className="w-3.5 h-3.5 rounded bg-accent-soft motion-safe:animate-pulse inline-block"
+              className="w-3.5 h-3.5 rounded-[2px] bg-surface-3 border border-rule-strong motion-safe:animate-pulse inline-block"
               aria-hidden="true"
             />
-            <span>Running</span>
+            <span className="mono lowercase">running</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span
-              className="w-3.5 h-3.5 rounded bg-ok-soft inline-block"
+              className="w-3.5 h-3.5 rounded-[2px] bg-surface-2 border border-rule inline-block"
               aria-hidden="true"
             />
-            <span>Done</span>
+            <span className="mono lowercase">done</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span
-              className="w-3.5 h-3.5 rounded bg-warn-soft inline-block"
+              className="w-3.5 h-3.5 rounded-[2px] bg-surface border border-rule border-dashed inline-block"
               aria-hidden="true"
             />
-            <span>Suppressed</span>
+            <span className="mono lowercase">suppressed</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span
-              className="w-3.5 h-3.5 rounded bg-critical-soft inline-block"
+              className="w-3.5 h-3.5 rounded-[2px] bg-red-soft border border-red-rule inline-block"
               aria-hidden="true"
             />
-            <span>Error</span>
+            <span className="mono lowercase text-red">error</span>
           </div>
         </div>
       </div>
 
       {/* 4. VERDICT TALLY */}
       {totalAdjudicated > 0 && (
-        <div className="flex flex-wrap items-center gap-4 py-2 border-y border-rule">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 py-3 border-y border-rule">
           {ALL_VERDICTS.map((verdict) => {
             const count = verdictCounts[verdict] ?? 0;
             return (
-              <div key={verdict} className="flex items-center gap-1.5">
+              <div key={verdict} className="flex items-center gap-2">
                 <VerdictChip verdict={verdict} />
                 <span
-                  className={`tabular font-mono text-sm ${
-                    count > 0 ? "font-semibold" : "text-muted"
+                  className={`tabular font-mono text-xs ${
+                    count > 0 ? "text-ink font-medium" : "text-faint"
                   }`}
                 >
                   {count}
@@ -519,31 +547,42 @@ export function DepositionGrid() {
       )}
 
       {/* 5. LOG */}
-      <div
-        ref={logContainerRef}
-        className="font-mono text-xs max-h-[280px] overflow-y-auto bg-surface border border-rule rounded p-3 flex flex-col gap-1"
-      >
-        {logLines.length === 0 ? (
-          <div className="text-muted">Awaiting log stream…</div>
-        ) : (
-          logLines.map((line, idx) => (
-            <div
-              key={idx}
-              className="leading-relaxed whitespace-pre-wrap break-all"
-            >
-              {line}
-            </div>
-          ))
-        )}
+      <div className="flex flex-col gap-1.5 w-full">
+        <div className="flex items-center justify-between text-xs">
+          <Bracket tone="muted">log stream</Bracket>
+          {logLines.length > 0 && (
+            <span className="tabular font-mono text-[11px] text-faint">
+              {logLines.length} {logLines.length === 1 ? "line" : "lines"}
+            </span>
+          )}
+        </div>
+        <div
+          ref={logContainerRef}
+          className="font-mono text-xs max-h-[260px] overflow-y-auto bg-surface border border-rule rounded-[3px] p-3 flex flex-col gap-1 text-ink"
+        >
+          {logLines.length === 0 ? (
+            <div className="text-faint">awaiting log stream…</div>
+          ) : (
+            logLines.map((line, idx) => (
+              <div
+                key={idx}
+                className="leading-relaxed whitespace-pre-wrap break-all text-muted"
+              >
+                {line}
+              </div>
+            ))
+          )}
+        </div>
       </div>
 
       {/* 6. ERROR */}
       {error && (
         <div
           role="alert"
-          className="bg-critical-soft text-critical border border-rule rounded p-3 text-sm"
+          className="bg-red-soft text-red border border-red-rule rounded-[3px] p-3 text-sm flex items-start gap-2.5"
         >
-          {error}
+          <Bracket tone="red">error</Bracket>
+          <span className="leading-normal">{error}</span>
         </div>
       )}
     </div>

@@ -1,4 +1,5 @@
 import { VerdictChip } from "@/components/Verdict";
+import { Bracket, Marker, Rule, SectionHead } from "@/components/ui";
 import type { ClaimCluster } from "@/lib/types";
 import { isDefect } from "@/lib/types";
 import type { PivotSource, Remedy, RemedyKind } from "@/lib/engine/remediation";
@@ -41,15 +42,13 @@ function EffortMeter({ effort }: { effort: Remedy["effort"] }) {
   const filled = EFFORT_BARS[effort];
   return (
     <span className="inline-flex items-center gap-2">
-      <span className="meta text-muted">Effort {effort}</span>
+      <Bracket tone="muted">effort {effort}</Bracket>
       <span className="inline-flex items-end gap-0.5" aria-hidden="true">
         {BAR_HEIGHTS.map((height, idx) => (
           <span
             key={height}
-            className={`w-1 border ${height} ${
-              idx < filled
-                ? "bg-rule-strong border-rule-strong"
-                : "border-rule"
+            className={`w-1 ${height} ${
+              idx < filled ? "bg-ink" : "border border-rule bg-surface-2"
             }`}
           />
         ))}
@@ -60,28 +59,38 @@ function EffortMeter({ effort }: { effort: Remedy["effort"] }) {
 
 function PivotSourceBlock({ pivot }: { pivot: PivotSource }) {
   return (
-    <div className="border-l-2 border-accent bg-surface-2 px-4 py-3 flex flex-col gap-1">
-      <div className="meta text-muted">Pivot source</div>
+    <div className="border-l-2 border-rule-strong bg-surface-2 px-4 py-3 flex flex-col gap-1.5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Bracket tone="muted">pivot source</Bracket>
+          <span className="meta text-muted">{pivot.domain}</span>
+        </div>
+        <div className="meta text-muted flex flex-wrap items-center gap-2">
+          <Bracket tone="muted">
+            cited <span className="tabular">{pivot.citationCount}&times;</span>
+          </Bracket>
+          <Bracket tone="muted">
+            {pivot.organicRank === null ? (
+              "unranked in top 20"
+            ) : (
+              <>
+                organic <span className="tabular">#{pivot.organicRank}</span>
+              </>
+            )}
+          </Bracket>
+          <Bracket tone="muted">
+            score <span className="tabular">{pivot.score.toFixed(1)}</span>
+          </Bracket>
+        </div>
+      </div>
       <a
         href={pivot.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-sm font-medium text-accent hover:underline break-words"
+        className="text-sm font-medium text-ink hover:underline break-words"
       >
         {pivot.title}
       </a>
-      <div className="meta text-muted flex flex-wrap gap-x-4 gap-y-1">
-        <span className="normal-case tracking-normal">{pivot.domain}</span>
-        <span className="tabular">
-          Cited {pivot.citationCount}&times;
-        </span>
-        <span className="tabular">
-          {pivot.organicRank === null
-            ? "Unranked in top 20"
-            : `Organic #${pivot.organicRank}`}
-        </span>
-        <span className="tabular">Score {pivot.score.toFixed(1)}</span>
-      </div>
       <p className="text-xs text-muted leading-relaxed">{pivot.why}</p>
     </div>
   );
@@ -90,19 +99,21 @@ function PivotSourceBlock({ pivot }: { pivot: PivotSource }) {
 function RemedyCard({ remedy }: { remedy: Remedy }) {
   return (
     <article className="border border-rule bg-surface flex flex-col">
-      <header className="flex flex-wrap items-start justify-between gap-x-6 gap-y-2 border-b border-rule px-4 py-3">
+      <header className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3 border-b border-rule px-4 py-3">
         <div className="flex flex-col gap-1 min-w-[16rem] flex-1">
-          <span className="meta text-muted">{KIND_LABEL[remedy.kind]}</span>
-          <h4 className="text-sm font-medium text-ink">{remedy.title}</h4>
-          <span className="text-xs text-muted">{KIND_TARGET[remedy.kind]}</span>
+          <div className="flex flex-wrap items-center gap-2">
+            <Bracket tone="muted">{KIND_LABEL[remedy.kind]}</Bracket>
+            <span className="text-xs text-muted">{KIND_TARGET[remedy.kind]}</span>
+          </div>
+          <h4 className="text-sm font-medium text-ink leading-snug">{remedy.title}</h4>
         </div>
         <div className="flex items-center gap-5 shrink-0">
           <EffortMeter effort={remedy.effort} />
           <div className="flex flex-col items-end">
-            <span className="tabular text-xl leading-none text-ink">
+            <span className="tabular mono text-xl leading-none text-ink">
               {remedy.priority}
             </span>
-            <span className="meta text-muted">Priority</span>
+            <Bracket tone="muted">priority</Bracket>
           </div>
         </div>
       </header>
@@ -113,8 +124,8 @@ function RemedyCard({ remedy }: { remedy: Remedy }) {
 
       <details className="group border-t border-rule">
         <summary className="cursor-pointer list-none px-4 py-2.5 meta text-muted hover:text-ink select-none">
-          <span className="group-open:hidden">Show example draft</span>
-          <span className="hidden group-open:inline">Hide example draft</span>
+          <span className="group-open:hidden">show example draft</span>
+          <span className="hidden group-open:inline">hide example draft</span>
         </summary>
         <div className="scroll-x border-t border-rule bg-surface-2 px-4 py-4">
           <pre className="testimony whitespace-pre text-ink text-[0.85rem] leading-relaxed">
@@ -157,15 +168,11 @@ export function RemediationPlan({
   const remedyCount = plans.reduce((n, p) => n + p.plan.remedies.length, 0);
 
   return (
-    <section className="flex flex-col gap-5">
-      <div className="flex flex-col gap-1">
+    <section className="flex flex-col gap-6">
+      <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <h2 className="text-base font-serif text-ink uppercase tracking-wider">
-            Remediation Plan
-          </h2>
-          <span className="inline-flex items-center border border-rule bg-surface px-2.5 py-0.5 meta text-muted">
-            Example drafts
-          </span>
+          <SectionHead title="Remediation Plan" />
+          <Bracket tone="muted">example drafts</Bracket>
         </div>
         <p className="max-w-[72ch] text-xs text-muted leading-relaxed">
           {remedyCount} action{remedyCount === 1 ? "" : "s"} across{" "}
@@ -186,6 +193,8 @@ export function RemediationPlan({
         </p>
       </div>
 
+      <Rule />
+
       {plans.length === 0 ? (
         <div className="border border-rule bg-surface p-6 text-sm text-muted">
           No remediation drafted. Either no defect cluster was recorded, or the
@@ -196,16 +205,17 @@ export function RemediationPlan({
           {plans.map(({ cluster, plan }) => {
             const observed = cluster.observedInLocales?.length ?? 0;
             return (
-              <div key={cluster.id} className="flex flex-col gap-3">
+              <div key={cluster.id} className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2 border-b border-rule pb-3">
-                  <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <Marker tone="red" />
                     <VerdictChip verdict={cluster.verdict} size="sm" />
-                    <span className="meta text-muted tabular">
-                      {observed}/{totalLocales} markets
-                    </span>
-                    <span className="meta text-muted tabular">
-                      {Math.round((cluster.frequency ?? 0) * 100)}% frequency
-                    </span>
+                    <Bracket tone="muted">
+                      <span className="tabular">{observed}/{totalLocales}</span> markets
+                    </Bracket>
+                    <Bracket tone="muted">
+                      <span className="tabular">{Math.round((cluster.frequency ?? 0) * 100)}%</span> frequency
+                    </Bracket>
                   </div>
                   <p className="testimony text-ink leading-relaxed max-w-[72ch]">
                     {cluster.canonicalText}
@@ -215,7 +225,7 @@ export function RemediationPlan({
                 {plan.pivot ? (
                   <PivotSourceBlock pivot={plan.pivot} />
                 ) : (
-                  <div className="border-l-2 border-rule bg-surface-2 px-4 py-3 text-xs text-muted">
+                  <div className="border-l-2 border-rule-strong bg-surface-2 px-4 py-3 text-xs text-muted">
                     No pivot source resolved. No single cited document stood out,
                     so remediation targets the entity&rsquo;s own record rather
                     than a publisher.
