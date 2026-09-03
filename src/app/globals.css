@@ -322,16 +322,19 @@ a:hover { color: var(--red); }
   width: 100vw;
   overflow: hidden;
   /* The glyph size lives HERE, not on the child, so the em-based clip below
-     resolves against the wordmark's own size rather than inherited body text. */
-  font-size: clamp(5rem, 23vw, 22rem);
+     resolves against the wordmark's own size rather than inherited body text.
+
+     38vw is measured, not guessed: "grounds" set in Instrument Serif renders
+     2.712px of ink per 1px of font-size, so 100vw / 2.712 = 36.9vw exactly fills
+     the viewport. Going slightly past that lets the final s break the right edge,
+     which reads as a deliberate crop rather than a centred logo that fell short. */
+  font-size: 38vw;
   line-height: 0.78;
-  /* Clip the descenders against the page edge, so it reads as a masthead
-     running off the document rather than a logo floating in whitespace. */
-  max-height: 0.62em;
+  /* Clip the descenders against the page edge. */
+  max-height: 0.6em;
 }
 .wordmark-bleed > span {
   display: block;
-  padding-left: 2vw;
   color: var(--ink);
   font-size: inherit;
   line-height: inherit;

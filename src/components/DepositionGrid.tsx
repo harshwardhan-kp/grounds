@@ -39,6 +39,7 @@ export function DepositionGrid() {
   const [entity, setEntity] = useState<string>("");
   const [mode, setMode] = useState<"idle" | "live" | "replay">("idle");
   const [liveDisabled, setLiveDisabled] = useState<boolean>(false);
+  const [liveAuditEnabled, setLiveAuditEnabled] = useState<boolean | null>(null);
   const [running, setRunning] = useState<boolean>(false);
   const [logLines, setLogLines] = useState<string[]>([]);
   const [cellStates, setCellStates] = useState<Map<string, CellStatus>>(
@@ -69,7 +70,28 @@ export function DepositionGrid() {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    let active = true;
+
+    fetch("/api/status")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Status check failed: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data: { liveAuditEnabled?: boolean; replayAvailable?: boolean }) => {
+        if (active) {
+          setLiveAuditEnabled(Boolean(data.liveAuditEnabled));
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setLiveAuditEnabled(false);
+        }
+      });
+
     return () => {
+      active = false;
       abortControllerRef.current?.abort();
     };
   }, []);
@@ -238,7 +260,7 @@ export function DepositionGrid() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (running || !entity.trim()) {
+    if (running || !entity.trim() || liveAuditEnabled !== true) {
       return;
     }
 
@@ -272,6 +294,7 @@ export function DepositionGrid() {
 
         if (res.status === 503 || detail?.liveDisabled) {
           setLiveDisabled(true);
+          setLiveAuditEnabled(false);
           setMode("idle");
           return;
         }
@@ -295,7 +318,7 @@ export function DepositionGrid() {
   }
 
   async function handleReplay() {
-    if (running) {
+    if (running || liveAuditEnabled === null) {
       return;
     }
 
@@ -338,36 +361,92 @@ export function DepositionGrid() {
   return (
     <div className="w-full max-w-[1080px] mx-auto flex flex-col gap-8">
       {/* 1. CONTROL ROW */}
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col sm:flex-row gap-3 w-full max-w-[1080px] mx-auto"
-      >
-        <input
-          type="text"
-          value={entity}
-          onChange={(e) => setEntity(e.target.value)}
-          placeholder="company or organisation name"
-          disabled={running}
-          className="bg-surface border border-rule rounded-[3px] px-5 py-2.5 w-full flex-1 text-ink text-[14px] placeholder:text-faint focus:outline-none focus:border-rule-strong disabled:opacity-40 transition-colors"
-        />
-        <PillButton
-          type="submit"
-          variant="primary"
-          disabled={running || !entity.trim()}
-          className="whitespace-nowrap"
+      <div className="flex flex-col gap-2.5 w-full max-w-[1080px] mx-auto">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col sm:flex-row gap-3 w-full"
         >
-          {running && mode === "live" ? "deposing…" : "depose"}
-        </PillButton>
-        <PillButton
-          type="button"
-          variant="secondary"
-          onClick={handleReplay}
-          disabled={running}
-          className="whitespace-nowrap"
-        >
-          {running && mode === "replay" ? "replaying…" : "replay recorded audit"}
-        </PillButton>
-      </form>
+          {liveAuditEnabled === false ? (
+            <>
+              <PillButton
+                type="button"
+                variant="primary"
+                onClick={handleReplay}
+                disabled={running}
+                className="whitespace-nowrap"
+              >
+                {running && mode === "replay"
+                  ? "replaying…"
+                  : "replay recorded audit"}
+              </PillButton>
+              <input
+                type="text"
+                value={entity}
+                onChange={(e) => setEntity(e.target.value)}
+                placeholder="live audits are off on this deployment"
+                disabled={true}
+                className="bg-surface border border-rule rounded-[3px] px-5 py-2.5 w-full flex-1 text-ink text-[14px] placeholder:text-faint focus:outline-none focus:border-rule-strong disabled:opacity-40 transition-colors"
+              />
+              <PillButton
+                type="submit"
+                variant="primary"
+                disabled={true}
+                className="whitespace-nowrap"
+              >
+                depose
+              </PillButton>
+            </>
+          ) : (
+            <>
+              <input
+                type="text"
+                value={entity}
+                onChange={(e) => setEntity(e.target.value)}
+                placeholder="company or organisation name"
+                disabled={running || liveAuditEnabled === null}
+                className="bg-surface border border-rule rounded-[3px] px-5 py-2.5 w-full flex-1 text-ink text-[14px] placeholder:text-faint focus:outline-none focus:border-rule-strong disabled:opacity-40 transition-colors"
+              />
+              <PillButton
+                type="submit"
+                variant="primary"
+                disabled={running || !entity.trim() || liveAuditEnabled === null}
+                className="whitespace-nowrap"
+              >
+                {liveAuditEnabled === null
+                  ? "[checking]"
+                  : running && mode === "live"
+                    ? "deposing…"
+                    : "depose"}
+              </PillButton>
+              <PillButton
+                type="button"
+                variant="secondary"
+                onClick={handleReplay}
+                disabled={running || liveAuditEnabled === null}
+                className="whitespace-nowrap"
+              >
+                {running && mode === "replay"
+                  ? "replaying…"
+                  : "replay recorded audit"}
+              </PillButton>
+            </>
+          )}
+        </form>
+
+        {liveAuditEnabled === false && (
+          <p className="text-muted text-xs leading-normal">
+            Running new searches is disabled here so the demo cannot spend search quota.
+            The replay streams a real recorded audit, and archive verification in the{" "}
+            <a
+              href="/dossier/wolf-river"
+              className="text-ink underline underline-offset-2 hover:opacity-80 transition-opacity"
+            >
+              dossier
+            </a>{" "}
+            is live.
+          </p>
+        )}
+      </div>
 
       {/* LIVE DISABLED NOTICE */}
       {liveDisabled && (
