@@ -104,12 +104,22 @@ Wait for MATCH.]*
 
 ---
 
+## What works on the live site vs. locally
+
+The archive verification in beat 5 **works on the deployed site** — a reviewer can click
+it themselves. Retrieving an archived search costs no quota, so the deployment carries a
+key for that alone; running new searches is gated behind a separate opt-in that is off
+in production.
+
+So: everything in this script can be recorded against
+**https://grounds-sigma.vercel.app** with nothing running locally.
+
 ## If a live run is asked for
 
-Don't. The public deployment runs without a SerpApi key on purpose so it cannot spend
-quota, and the replay is a real recorded audit paced by real latencies. If a judge wants
-live, run it locally with a key — but never present the replay as live. Say the word
-"replay" in the narration and let the banner stay on screen.
+Don't record one. The replay is a real recorded audit paced by real latencies, and live
+auditing is deliberately off in production so the demo cannot spend quota. If a judge
+wants live, run it locally with `GROUNDS_LIVE_AUDIT=on` — but never present the replay
+as live. Say the word "replay" in the narration and leave the banner on screen.
 
 ## Honesty checklist before you upload
 

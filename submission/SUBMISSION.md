@@ -205,10 +205,13 @@ findings go to a human review queue, and the app never uses the word "defamation
 strongest permitted claim is that no support for an assertion was found in the sources
 cited beside it. Those are enforced by tests, not by intention.
 
-And the demo is honest. The public deployment runs **without** a SerpApi key so it
-cannot spend quota, so we built a replay that streams a real recorded audit through the
-identical event contract, paced by each observation's actually-recorded latency. It is
-labelled as a replay in three places and its counter reads "recorded searches."
+And the demo is honest without being crippled. Running new searches is gated off in
+production so the deployment cannot spend quota, and a replay streams a real recorded
+audit through the identical event contract, paced by each observation's actually-recorded
+latency — labelled as a replay in three places, with its counter reading "recorded
+searches." But because retrieving an archived search costs nothing, the archive
+verification is genuinely live: a judge can click "verify against archive" on the
+deployed site and watch it re-fetch and re-hash a real SerpApi record.
 
 ## What we learned
 
