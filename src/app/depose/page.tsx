@@ -14,7 +14,7 @@ export const metadata = {
  */
 export default function DeposePage() {
   return (
-    <main className="mx-auto flex max-w-[1100px] flex-col gap-10 px-5 py-12 min-[720px]:py-16">
+    <main className="mx-auto flex max-w-[1100px] flex-col gap-10 px-5 pt-12 pb-0 min-[720px]:pt-16">
       <header className="mx-auto flex w-full max-w-[1080px] flex-col gap-6">
         <div>
           <Link

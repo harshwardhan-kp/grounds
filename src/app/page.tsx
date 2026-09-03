@@ -98,7 +98,7 @@ const VERDICTS: VerdictDefinition[] = [
 
 export default function HomePage() {
   return (
-    <div className="max-w-[1080px] mx-auto px-6 flex flex-col gap-20 py-8">
+    <div className="max-w-[1080px] mx-auto px-6 flex flex-col gap-20 pt-8 pb-0">
       {/* 1. TOP BAR */}
       <header className="flex flex-col gap-4">
         <div className="flex items-center justify-between">

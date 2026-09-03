@@ -332,6 +332,10 @@ a:hover { color: var(--red); }
   line-height: 0.78;
   /* Clip the descenders against the page edge. */
   max-height: 0.6em;
+  /* The wordmark is always the last child of a flex column whose `gap` would
+     otherwise hold it off the page edge. Cancel that gap so the crop happens
+     against the bottom of the document and not against a strip of ground. */
+  margin-top: auto;
 }
 .wordmark-bleed > span {
   display: block;

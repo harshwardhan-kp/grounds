@@ -161,7 +161,7 @@ export default async function DossierPage({ params }: PageProps) {
   });
 
   return (
-    <main className="max-w-[1100px] mx-auto px-4 sm:px-6 py-8 sm:py-12 flex flex-col gap-10 sm:gap-12">
+    <main className="max-w-[1100px] mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-0 flex flex-col gap-10 sm:gap-12">
       {/* 1. HEADER BAR */}
       <header className="flex flex-col gap-4 border-b border-rule pb-8">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
