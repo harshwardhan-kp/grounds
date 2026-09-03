@@ -131,16 +131,16 @@ export default function HomePage() {
       </header>
 
       {/* 2. HERO */}
-      <section className="flex flex-col gap-6">
-        <h1 className="display lowercase text-[clamp(2.2rem,6vw,4.2rem)] leading-[1.08] text-ink tracking-tight [text-wrap:balance] m-0">
+      <section className="flex flex-col gap-6 text-center">
+        <h1 className="display lowercase text-[clamp(2.6rem,7vw,5rem)] leading-[1.08] text-ink tracking-tight [text-wrap:balance] text-center m-0">
           every ai answer about you,{" "}
           <span className="italic">cross-examined</span> against its own sources
         </h1>
-        <p className="text-muted text-base sm:text-lg leading-relaxed max-w-[58ch] m-0">
+        <p className="text-muted text-[1.15rem] leading-relaxed max-w-[54ch] mx-auto text-center m-0">
           generative search now answers questions about companies directly and cites
           sources, and nobody checks whether those sources actually support what it says.
         </p>
-        <div className="flex flex-wrap items-center gap-3 pt-2">
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           <PillButton href="/dossier/wolf-river" variant="primary">
             open the recorded dossier
           </PillButton>
@@ -148,7 +148,7 @@ export default function HomePage() {
             watch a deposition
           </PillButton>
         </div>
-        <p className="meta text-xs text-muted m-0">
+        <p className="meta text-xs text-muted text-center m-0">
           <Bracket tone="muted">
             recorded 2026-09-01 · 148 searches · 8 markets
           </Bracket>
@@ -157,20 +157,24 @@ export default function HomePage() {
 
       {/* 3. THE CASE */}
       <section className="flex flex-col gap-6">
-        <SectionHead index="01" title="the case that started this" />
-        <div className="flex flex-col gap-3 max-w-[62ch]">
-          <p className="text-ink text-sm sm:text-base leading-relaxed m-0">
+        <SectionHead
+          index="01"
+          title="the case that started this"
+          className="w-full items-center text-center [&>div]:justify-center [&_h2]:text-[2rem]"
+        />
+        <div className="flex flex-col gap-4 max-w-[64ch] mx-auto w-full">
+          <p className="text-ink text-[1.05rem] leading-relaxed max-w-[64ch] mx-auto m-0">
             In 2025 a Google AI Overview told searchers a Minnesota solar installer was being
             sued by the state Attorney General. It was not. The answer cited four sources and
             none of them contained the claim. The company reported losing a $150,000 contract
             and sued Google; that litigation is ongoing.
           </p>
-          <p className="text-muted text-sm sm:text-base leading-relaxed m-0">
+          <p className="text-muted text-[1.05rem] leading-relaxed max-w-[64ch] mx-auto m-0">
             Google has since corrected that answer, which is the point — generative answers
             change underneath you, so this has to be measured continuously rather than once.
           </p>
         </div>
-        <div className="flex flex-col gap-3 max-w-[62ch]">
+        <div className="flex flex-col gap-3 max-w-[64ch] mx-auto w-full">
           <Annotation label="cited">
             four sources, formatted exactly like a grounded answer
           </Annotation>
@@ -185,13 +189,17 @@ export default function HomePage() {
 
       {/* 4. THE GAP */}
       <section className="flex flex-col gap-4">
-        <SectionHead index="02" title="what nobody measures" />
-        <div className="flex flex-col gap-3 max-w-[62ch]">
-          <p className="text-ink text-sm sm:text-base leading-relaxed m-0">
+        <SectionHead
+          index="02"
+          title="what nobody measures"
+          className="w-full items-center text-center [&>div]:justify-center [&_h2]:text-[2rem]"
+        />
+        <div className="flex flex-col gap-4 max-w-[64ch] mx-auto w-full">
+          <p className="text-ink text-[1.05rem] leading-relaxed max-w-[64ch] mx-auto m-0">
             There is a whole category of AI-visibility tools and they all measure the
             same thing — is the brand mentioned, in which prompts, with what sentiment.
           </p>
-          <p className="text-muted text-sm sm:text-base leading-relaxed m-0">
+          <p className="text-muted text-[1.05rem] leading-relaxed max-w-[64ch] mx-auto m-0">
             None of them check whether the sources cited beside a sentence actually
             contain that sentence. The missing property is{" "}
             <span className="text-red">attribution integrity</span>.
@@ -201,20 +209,26 @@ export default function HomePage() {
 
       {/* 5. METHOD */}
       <section className="flex flex-col gap-6">
-        <SectionHead index="03" title="how a deposition runs" />
-        <ol className="flex flex-col gap-6 list-none p-0 m-0">
+        <SectionHead
+          index="03"
+          title="how a deposition runs"
+          className="w-full items-center text-center [&>div]:justify-center [&_h2]:text-[2rem]"
+        />
+        <ol className="flex flex-col gap-8 list-none p-0 m-0 max-w-[860px] mx-auto w-full">
           {STAGES.map((stage, idx) => (
             <li
               key={stage.name}
-              className="grid grid-cols-1 min-[720px]:grid-cols-[200px_1fr] items-baseline gap-2 min-[720px]:gap-6"
+              className="grid grid-cols-1 min-[720px]:grid-cols-[200px_1fr] items-baseline gap-2 min-[720px]:gap-6 text-left"
             >
               <div className="flex items-baseline gap-2.5">
                 <span className="tabular mono text-muted text-xs">
                   {String(idx + 1).padStart(2, "0")}
                 </span>
-                <Bracket tone="ink">{stage.name}</Bracket>
+                <Bracket tone="ink" className="text-[1.02rem]">
+                  {stage.name}
+                </Bracket>
               </div>
-              <p className="text-muted text-sm leading-relaxed m-0">
+              <p className="text-muted text-[1.02rem] leading-relaxed m-0">
                 {stage.description}
               </p>
             </li>
@@ -224,39 +238,41 @@ export default function HomePage() {
 
       {/* 6. VERDICTS */}
       <section className="flex flex-col gap-6">
-        <SectionHead index="04" title="the eight verdicts" />
-        <dl className="flex flex-col gap-4 m-0 p-0">
+        <SectionHead
+          index="04"
+          title="the eight verdicts"
+          className="w-full items-center text-center [&>div]:justify-center [&_h2]:text-[2rem]"
+        />
+        <dl className="flex flex-col gap-6 m-0 p-0 max-w-[860px] mx-auto w-full">
           {VERDICTS.map(({ verdict, meaning }) => (
             <div
               key={verdict}
-              className="grid grid-cols-1 min-[720px]:grid-cols-[180px_1fr] items-baseline gap-2 min-[720px]:gap-6"
+              className="grid grid-cols-1 min-[720px]:grid-cols-[180px_1fr] items-baseline gap-2 min-[720px]:gap-6 text-left"
             >
               <dt className="m-0">
                 <VerdictChip verdict={verdict} />
               </dt>
-              <dd className="text-muted text-sm leading-relaxed m-0">
+              <dd className="text-muted text-[1.02rem] leading-relaxed m-0">
                 {meaning}
               </dd>
             </div>
           ))}
         </dl>
-        <p className="text-muted text-sm leading-relaxed pt-4 border-t border-rule m-0">
+        <p className="text-muted text-[1.05rem] leading-relaxed pt-6 border-t border-rule max-w-[860px] mx-auto w-full m-0">
           <span className="mono text-ink">UNVERIFIABLE</span> is never counted as a
           defect, because an unreadable source must never become an accusation.
         </p>
       </section>
 
       {/* 7. FOOT */}
-      <footer className="flex flex-col gap-8 pb-16">
+      <footer className="flex flex-col gap-8">
         <Rule />
-        <p className="meta text-xs text-muted m-0">
+        <p className="meta text-xs text-muted text-center m-0">
           <Bracket tone="muted">
             grounds reports observations, not legal conclusions
           </Bracket>
         </p>
-        <div className="w-full overflow-hidden">
-          <Wordmark text="grounds" />
-        </div>
+        <Wordmark text="grounds" />
       </footer>
     </div>
   );

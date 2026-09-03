@@ -1,4 +1,5 @@
 import { ForensicInspector } from "@/components/ForensicInspector";
+import { Wordmark } from "@/components/ui";
 import { LiveCapture } from "@/components/LiveCapture";
 import { DivergenceMap } from "@/components/DivergenceMap";
 import { PrintDossier } from "@/components/PrintDossier";
@@ -164,7 +165,7 @@ export default async function DossierPage({ params }: PageProps) {
       {/* 1. HEADER BAR */}
       <header className="flex flex-col gap-4 border-b border-rule pb-8">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
-          <h1 className="text-3xl sm:text-4xl font-serif text-foreground tracking-tight">
+          <h1 className="display text-[clamp(2.4rem,5vw,3.4rem)] text-ink">
             {entityName}
           </h1>
           {audit.fromFixture && (
@@ -213,7 +214,7 @@ export default async function DossierPage({ params }: PageProps) {
 
       {/* 3. EXECUTIVE SUMMARY */}
       <section className="flex flex-col gap-2 border-l-2 border-rule pl-4 py-1">
-        <p className="text-lg sm:text-xl font-serif text-foreground leading-relaxed">
+        <p className="text-lg sm:text-xl font-serif text-ink leading-relaxed">
           {summarySentence}
         </p>
         <p className="text-xs text-muted">
@@ -226,10 +227,10 @@ export default async function DossierPage({ params }: PageProps) {
       {/* 3b. VERDICT DISTRIBUTION */}
       <section className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
-          <h2 className="text-base font-serif text-ink uppercase tracking-wider">
+          <h2 className="display text-[2rem] text-ink text-center">
             Verdict Distribution
           </h2>
-          <p className="text-xs text-muted">
+          <p className="text-xs text-muted mx-auto text-center">
             Every adjudicated cluster in this audit, grouped by what its cited
             sources turned out to say.
           </p>
@@ -239,8 +240,8 @@ export default async function DossierPage({ params }: PageProps) {
 
       {/* Genuine capture, so a reviewer can re-verify one finding for real. */}
       <section className="flex flex-col gap-3">
-        <h2 className="meta">Today&rsquo;s answer, captured live</h2>
-        <p className="max-w-[68ch] text-sm text-muted">
+        <h2 className="display text-[2rem] text-ink text-center">Today&rsquo;s answer, captured live</h2>
+        <p className="max-w-[68ch] mx-auto text-center text-[1.02rem] text-muted">
           The dossier below is a recorded audit. This one observation is real and
           its SerpApi archive record still exists, so the verification in its
           inspector can be checked against SerpApi rather than taken on trust.
@@ -251,10 +252,10 @@ export default async function DossierPage({ params }: PageProps) {
       {/* 4. DEFECT REGISTER */}
       <section className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
-          <h2 className="text-base font-serif text-foreground uppercase tracking-wider">
+          <h2 className="display text-[2rem] text-ink text-center">
             Defect Register
           </h2>
-          <p className="text-xs text-muted">
+          <p className="text-xs text-muted mx-auto text-center">
             Aggregated clusters exhibiting citation failure or contradictory
             evidence, ranked by severity.
           </p>
@@ -294,7 +295,7 @@ export default async function DossierPage({ params }: PageProps) {
                       className="border-b border-rule last:border-b-0 hover:bg-surface/50 transition-colors"
                     >
                       <td
-                        className="p-3 sm:p-4 text-foreground font-normal max-w-xs sm:max-w-md truncate"
+                        className="p-3 sm:p-4 text-ink font-normal max-w-xs sm:max-w-md truncate"
                         title={cluster.canonicalText}
                       >
                         {truncate(cluster.canonicalText, 80)}
@@ -310,7 +311,7 @@ export default async function DossierPage({ params }: PageProps) {
                           {observedCount}/{totalLocales}
                         </span>
                       </td>
-                      <td className="p-3 sm:p-4 whitespace-nowrap text-foreground">
+                      <td className="p-3 sm:p-4 whitespace-nowrap text-ink">
                         <span className="tabular">{freqPct}%</span>
                       </td>
                       <td className="p-3 sm:p-4 meta whitespace-nowrap text-muted">
@@ -328,10 +329,10 @@ export default async function DossierPage({ params }: PageProps) {
       {/* 4b. GEOGRAPHIC DIVERGENCE */}
       <section className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
-          <h2 className="text-base font-serif text-ink uppercase tracking-wider">
+          <h2 className="display text-[2rem] text-ink text-center">
             Geographic Divergence
           </h2>
-          <p className="max-w-[72ch] text-xs text-muted leading-relaxed">
+          <p className="max-w-[72ch] mx-auto text-center text-[0.98rem] text-muted leading-relaxed">
             Which markets produced each assertion, and which markets were
             sampled and did not. Generative answers are not the same everywhere,
             so an assertion present in one market and absent in another is the
@@ -344,10 +345,10 @@ export default async function DossierPage({ params }: PageProps) {
       {/* 5. EVIDENCE */}
       <section className="flex flex-col gap-6">
         <div className="flex flex-col gap-1">
-          <h2 className="text-base font-serif text-foreground uppercase tracking-wider">
+          <h2 className="display text-[2rem] text-ink text-center">
             Evidence Trail
           </h2>
-          <p className="text-xs text-muted">
+          <p className="text-xs text-muted mx-auto text-center">
             Forensic cross-examination of each defect cluster against cited sources
             and independent corroboration probes.
           </p>
@@ -432,11 +433,11 @@ export default async function DossierPage({ params }: PageProps) {
                 <div className="meta flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs text-muted px-1">
                   <span>
                     Citation trail:{" "}
-                    <span className="text-foreground">{trailText}</span>
+                    <span className="text-ink">{trailText}</span>
                   </span>
                   <span>
                     Observation hash:{" "}
-                    <span className="font-mono text-foreground">{hash16}</span>
+                    <span className="font-mono text-ink">{hash16}</span>
                   </span>
                 </div>
 
@@ -490,6 +491,8 @@ export default async function DossierPage({ params }: PageProps) {
           or assessments of legality.
         </p>
       </footer>
+
+      <Wordmark text="grounds" />
     </main>
   );
 }

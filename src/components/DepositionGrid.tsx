@@ -336,16 +336,19 @@ export function DepositionGrid() {
   }
 
   return (
-    <div className="w-full max-w-[1100px] mx-auto flex flex-col gap-6">
+    <div className="w-full max-w-[1080px] mx-auto flex flex-col gap-8">
       {/* 1. CONTROL ROW */}
-      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2.5 w-full">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col sm:flex-row gap-3 w-full max-w-[1080px] mx-auto"
+      >
         <input
           type="text"
           value={entity}
           onChange={(e) => setEntity(e.target.value)}
           placeholder="company or organisation name"
           disabled={running}
-          className="bg-surface border border-rule rounded-[3px] px-3 py-2 w-full flex-1 text-ink text-sm placeholder:text-faint focus:outline-none focus:border-rule-strong disabled:opacity-40 transition-colors"
+          className="bg-surface border border-rule rounded-[3px] px-5 py-2.5 w-full flex-1 text-ink text-[14px] placeholder:text-faint focus:outline-none focus:border-rule-strong disabled:opacity-40 transition-colors"
         />
         <PillButton
           type="submit"
@@ -368,8 +371,8 @@ export function DepositionGrid() {
 
       {/* LIVE DISABLED NOTICE */}
       {liveDisabled && (
-        <div className="bg-surface-2 border border-rule p-3.5 rounded-[3px] text-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-start gap-2.5">
+        <div className="bg-surface-2 border border-rule p-4 rounded-[3px] text-[1.02rem] leading-relaxed flex flex-col sm:flex-row sm:items-center justify-between gap-4 max-w-[1080px] w-full mx-auto">
+          <div className="flex items-start gap-2.5 max-w-[64ch]">
             <Bracket tone="muted">notice</Bracket>
             <span className="text-muted leading-relaxed">
               Live audits are off on this deployment so it cannot spend search quota.
@@ -391,7 +394,7 @@ export function DepositionGrid() {
       )}
 
       {/* 2. BUDGET BAR */}
-      <div className="flex flex-col gap-1.5 w-full">
+      <div className="flex flex-col gap-2 w-full max-w-[1080px] mx-auto">
         <div className="flex items-baseline justify-between text-xs">
           <Bracket tone="muted">
             {mode === "replay" ? "recorded searches" : "searches"}
@@ -409,9 +412,9 @@ export function DepositionGrid() {
       </div>
 
       {/* 3. GRID */}
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-5 w-full max-w-[1080px] mx-auto">
         {mode === "replay" && (
-          <div className="flex items-baseline gap-2 text-xs text-muted">
+          <div className="flex items-baseline justify-center gap-2 text-xs text-muted text-center">
             <Bracket tone="ink">replay</Bracket>
             <span>Streaming a recorded audit. No live searches are performed.</span>
           </div>
@@ -420,7 +423,7 @@ export function DepositionGrid() {
         <div className="scroll-x w-full">
           {locales.length > 0 && probes.length > 0 ? (
             <div
-              className="grid gap-1.5 w-max"
+              className="grid gap-2 w-max mx-auto"
               style={{
                 gridTemplateColumns: `minmax(0, 280px) repeat(${locales.length}, minmax(104px, 1fr))`,
               }}
@@ -456,7 +459,7 @@ export function DepositionGrid() {
                         title={desc}
                         aria-label={desc}
                         role="gridcell"
-                        className={`h-[38px] w-full rounded-[2px] border transition-colors flex items-center justify-center px-1 text-center ${getCellBgClass(
+                        className={`h-[40px] w-full rounded-[2px] border transition-colors flex items-center justify-center px-1 text-center ${getCellBgClass(
                           status
                         )}`}
                       >
@@ -478,7 +481,7 @@ export function DepositionGrid() {
               ))}
             </div>
           ) : (
-            <div className="py-12 text-center text-muted border border-rule rounded-[3px] bg-surface text-xs mono">
+            <div className="py-16 text-center text-muted border border-rule rounded-[3px] bg-surface text-xs mono flex items-center justify-center gap-2">
               <Bracket tone="muted">pending</Bracket>{" "}
               <span className="text-muted">grid will populate as deposition proceeds.</span>
             </div>
@@ -486,7 +489,7 @@ export function DepositionGrid() {
         </div>
 
         {/* LEGEND */}
-        <div className="flex flex-wrap items-center gap-4 text-xs text-muted">
+        <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-muted">
           <div className="flex items-center gap-1.5">
             <span
               className="w-3.5 h-3.5 rounded-[2px] bg-ground border border-rule inline-block"
@@ -527,7 +530,7 @@ export function DepositionGrid() {
 
       {/* 4. VERDICT TALLY */}
       {totalAdjudicated > 0 && (
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 py-3 border-y border-rule">
+        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 py-4 border-y border-rule w-full max-w-[1080px] mx-auto">
           {ALL_VERDICTS.map((verdict) => {
             const count = verdictCounts[verdict] ?? 0;
             return (
@@ -547,7 +550,7 @@ export function DepositionGrid() {
       )}
 
       {/* 5. LOG */}
-      <div className="flex flex-col gap-1.5 w-full">
+      <div className="flex flex-col gap-2 w-full max-w-[1080px] mx-auto">
         <div className="flex items-center justify-between text-xs">
           <Bracket tone="muted">log stream</Bracket>
           {logLines.length > 0 && (
@@ -558,7 +561,7 @@ export function DepositionGrid() {
         </div>
         <div
           ref={logContainerRef}
-          className="font-mono text-xs max-h-[260px] overflow-y-auto bg-surface border border-rule rounded-[3px] p-3 flex flex-col gap-1 text-ink"
+          className="font-mono text-xs max-h-[260px] overflow-y-auto bg-surface border border-rule rounded-[3px] p-4 flex flex-col gap-1.5 text-ink"
         >
           {logLines.length === 0 ? (
             <div className="text-faint">awaiting log stream…</div>
@@ -579,10 +582,10 @@ export function DepositionGrid() {
       {error && (
         <div
           role="alert"
-          className="bg-red-soft text-red border border-red-rule rounded-[3px] p-3 text-sm flex items-start gap-2.5"
+          className="bg-red-soft text-red border border-red-rule rounded-[3px] p-4 text-[1.02rem] leading-relaxed flex items-start gap-2.5 w-full max-w-[1080px] mx-auto"
         >
           <Bracket tone="red">error</Bracket>
-          <span className="leading-normal">{error}</span>
+          <span className="leading-relaxed">{error}</span>
         </div>
       )}
     </div>

@@ -163,7 +163,7 @@ export function PillButton({
   className = "",
 }: PillButtonProps) {
   const baseStyles =
-    "mono lowercase text-xs px-4 py-2 rounded-[3px] inline-flex items-center justify-center transition-colors focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-1";
+    "mono lowercase text-[14px] px-5 py-2.5 rounded-[3px] inline-flex items-center justify-center transition-colors focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-1";
 
   const variantStyles =
     variant === "secondary"
@@ -317,10 +317,10 @@ export interface WordmarkProps {
 export function Wordmark({ text, className = "" }: WordmarkProps) {
   return (
     <div
-      className={`w-full overflow-hidden select-none pointer-events-none ${className}`.trim()}
+      className={`wordmark-bleed select-none pointer-events-none ${className}`.trim()}
       aria-hidden="true"
     >
-      <span className="display block lowercase leading-none tracking-tighter text-faint whitespace-nowrap text-[clamp(4rem,18vw,16rem)]">
+      <span className="display lowercase tracking-tight whitespace-nowrap">
         {text.toLowerCase()}
       </span>
     </div>

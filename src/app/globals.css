@@ -143,8 +143,8 @@ body {
 body {
   color: var(--ink);
   font-family: var(--font-schibsted), ui-sans-serif, system-ui, sans-serif;
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 16.5px;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -152,7 +152,7 @@ body {
    annotated the way an engineering drawing annotates a part. */
 .bracket {
   font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 11px;
+  font-size: 12.5px;
   letter-spacing: 0.02em;
   text-transform: lowercase;
   color: var(--muted);
@@ -164,7 +164,7 @@ body {
 /* Unbracketed mono, for hashes and ids that a reader may need to copy. */
 .mono {
   font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 11px;
+  font-size: 12.5px;
   letter-spacing: 0.01em;
   color: var(--muted);
 }
@@ -172,7 +172,7 @@ body {
 /* Kept for compatibility with existing markup; same voice as .mono. */
 .meta {
   font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 10.5px;
+  font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
@@ -190,8 +190,8 @@ body {
    as interface copy. */
 .testimony {
   font-family: var(--font-instrument-serif), "Times New Roman", serif;
-  font-size: 1.2rem;
-  line-height: 1.4;
+  font-size: 1.35rem;
+  line-height: 1.45;
 }
 
 .tabular { font-variant-numeric: tabular-nums; }
@@ -304,4 +304,35 @@ a:hover { color: var(--red); }
     color: var(--muted);
     word-break: break-all;
   }
+}
+
+/* ------------------------------------------------------------------ *
+ * Page-foot wordmark.
+ *
+ * It reads as a masthead cropped by the page edge, not as a centred logo
+ * floating in whitespace: full-bleed, flush left, clipped at the baseline so
+ * the descenders run off the bottom of the document.
+ * ------------------------------------------------------------------ */
+.wordmark-bleed {
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  width: 100vw;
+  overflow: hidden;
+  /* The glyph size lives HERE, not on the child, so the em-based clip below
+     resolves against the wordmark's own size rather than inherited body text. */
+  font-size: clamp(5rem, 23vw, 22rem);
+  line-height: 0.78;
+  /* Clip the descenders against the page edge, so it reads as a masthead
+     running off the document rather than a logo floating in whitespace. */
+  max-height: 0.62em;
+}
+.wordmark-bleed > span {
+  display: block;
+  padding-left: 2vw;
+  color: var(--ink);
+  font-size: inherit;
+  line-height: inherit;
 }
