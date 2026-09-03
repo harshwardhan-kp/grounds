@@ -1,10 +1,10 @@
 {
-  "capturedAt": "2026-09-02T10:56:24.404Z",
+  "capturedAt": "2026-09-03T06:25:57.479Z",
   "query": "is Wolf River Electric being sued",
   "location": "Minneapolis, Minnesota, United States",
-  "searchId": "6a97eeedbadf0b0ca4fff9b6",
-  "payloadHash": "376b043ecf4241ea1754550e5890830cf40bbd1acfbc7867be231bd24bc7a10b",
-  "latencyMs": 434,
+  "searchId": "6a9912eaa1de12ec9c8cfe0f",
+  "payloadHash": "dee35f8784494501775d39e1bcdf13932a1ddfc2af3d7b8077856a2fb3951e2d",
+  "latencyMs": 11612,
   "params": {
     "engine": "google_ai_mode",
     "gl": "us",
@@ -12,20 +12,20 @@
     "location": "Minneapolis, Minnesota, United States",
     "q": "is Wolf River Electric being sued"
   },
-  "archiveUrl": "https://serpapi.com/searches/6a97eeedbadf0b0ca4fff9b6",
+  "archiveUrl": "https://serpapi.com/searches/6a9912eaa1de12ec9c8cfe0f",
   "suppressed": false,
   "textBlocks": [
     {
       "type": "paragraph",
-      "snippet": "No, Wolf River Electric is not the one being sued."
+      "snippet": "No, Wolf River Electric is not being sued by the Minnesota Attorney General, nor are they a defendant in that state lawsuit."
     },
     {
       "type": "paragraph",
-      "snippet": "The confusion stems from a prominent error made by Google's \"AI Overview\" feature, which falsely claimed that the Isanti, Minnesota-based solar installation company was facing a lawsuit from the Minnesota Attorney General. While the Minnesota Attorney General did file a lawsuit against several separate solar-lending companies regarding hidden fees, Wolf River Electric was never a defendant in that case."
+      "snippet": "The confusion stems from a prominent error made by Google's \"AI Overview\" feature, which incorrectly claimed that the Isanti, Minnesota-based solar company was facing a deceptive sales practices lawsuit from the Minnesota Attorney General. While the Minnesota AG did file a lawsuit against separate solar-lending companies, Wolf River Electric was never a defendant."
     },
     {
       "type": "paragraph",
-      "snippet": "Instead, Wolf River Electric is the plaintiff. The company filed a defamation lawsuit against Google, seeking massive damages after the AI's incorrect summary led to canceled customer contracts and business losses."
+      "snippet": "Ironically, the situation is actually the reverse: Wolf River Electric is the one suing. The company filed a major defamation lawsuit against Google, seeking substantial damages over business losses caused by the AI's false summary."
     },
     {
       "type": "paragraph",
@@ -34,10 +34,6 @@
     {
       "type": "list",
       "snippet": ""
-    },
-    {
-      "type": "paragraph",
-      "snippet": "Let me know what else you'd like to explore!"
     }
   ],
   "references": [
@@ -50,24 +46,31 @@
     },
     {
       "index": 1,
-      "title": "An AI Defamed a Solar Company. Google Says It’s Not Responsible. | by Purdy House Publishing | Apr, 2026 | Medium",
+      "title": "An AI Defamed a Solar Company. Google Says It's Not ...",
       "link": "https://medium.com",
-      "snippet": "Wolf River Electric is a solar installation company based in Isanti, Minnesota. The company was not sued by the Minnesota Attorney General. However, Google's AI Ov...",
+      "snippet": "Purdy House Publishing 5 min read Apr 18, 2026 Press enter or click to view image in full size Image Credit: DallE Wolf River Electric is a solar installation comp...",
       "source": "Medium"
+    },
+    {
+      "index": 2,
+      "title": "Dean William McGeveran Quoted in Star Tribune About Lawsuit Regarding AI False Statement | University of Minnesota Law School",
+      "link": "https://law.umn.edu",
+      "snippet": "Wolf River Electric, an Isanti-based company, filed a lawsuit against Google in March in state court. The lawsuit claims that Google's \\\"AI Overview\\\" falsely stated...",
+      "source": "Minnesota Law School"
     }
   ],
   "raw": {
     "search_metadata": {
-      "id": "6a97eeedbadf0b0ca4fff9b6",
+      "id": "6a9912eaa1de12ec9c8cfe0f",
       "status": "Success",
-      "json_endpoint": "https://serpapi.com/searches/D9ibnRTY1SAxFqhVHSc6yW-0ZdPRaaad1FKMMLMHMCw/6a97eeedbadf0b0ca4fff9b6.json",
-      "markdown_endpoint": "https://serpapi.com/searches/D9ibnRTY1SAxFqhVHSc6yW-0ZdPRaaad1FKMMLMHMCw/6a97eeedbadf0b0ca4fff9b6.md",
-      "created_at": "2026-09-02 09:39:57 UTC",
-      "processed_at": "2026-09-02 09:39:57 UTC",
+      "json_endpoint": "https://serpapi.com/searches/3rFAhNxyEQop9CqO9q5g64884J1o0tJBIGuByJPNWIo/6a9912eaa1de12ec9c8cfe0f.json",
+      "markdown_endpoint": "https://serpapi.com/searches/3rFAhNxyEQop9CqO9q5g64884J1o0tJBIGuByJPNWIo/6a9912eaa1de12ec9c8cfe0f.md",
+      "created_at": "2026-09-03 06:25:46 UTC",
+      "processed_at": "2026-09-03 06:25:46 UTC",
       "google_ai_mode_url": "https://www.google.com/search?q=is+Wolf+River+Electric+being+sued&udm=50&gl=us&hl=en&uule=w+CAIQICIjTWlubmVhcG9saXMsTWlubmVzb3RhLFVuaXRlZCBTdGF0ZXM",
-      "raw_html_file": "https://serpapi.com/searches/D9ibnRTY1SAxFqhVHSc6yW-0ZdPRaaad1FKMMLMHMCw/6a97eeedbadf0b0ca4fff9b6.html",
-      "prettify_html_file": "https://serpapi.com/searches/D9ibnRTY1SAxFqhVHSc6yW-0ZdPRaaad1FKMMLMHMCw/6a97eeedbadf0b0ca4fff9b6.prettify",
-      "total_time_taken": 2.41
+      "raw_html_file": "https://serpapi.com/searches/3rFAhNxyEQop9CqO9q5g64884J1o0tJBIGuByJPNWIo/6a9912eaa1de12ec9c8cfe0f.html",
+      "prettify_html_file": "https://serpapi.com/searches/3rFAhNxyEQop9CqO9q5g64884J1o0tJBIGuByJPNWIo/6a9912eaa1de12ec9c8cfe0f.prettify",
+      "total_time_taken": 10.24
     },
     "search_parameters": {
       "engine": "google_ai_mode",
@@ -81,15 +84,15 @@
     "text_blocks": [
       {
         "type": "paragraph",
-        "snippet": "No, Wolf River Electric is not the one being sued."
+        "snippet": "No, Wolf River Electric is not being sued by the Minnesota Attorney General, nor are they a defendant in that state lawsuit."
       },
       {
         "type": "paragraph",
-        "snippet": "The confusion stems from a prominent error made by Google's \"AI Overview\" feature, which falsely claimed that the Isanti, Minnesota-based solar installation company was facing a lawsuit from the Minnesota Attorney General. While the Minnesota Attorney General did file a lawsuit against several separate solar-lending companies regarding hidden fees, Wolf River Electric was never a defendant in that case."
+        "snippet": "The confusion stems from a prominent error made by Google's \"AI Overview\" feature, which incorrectly claimed that the Isanti, Minnesota-based solar company was facing a deceptive sales practices lawsuit from the Minnesota Attorney General. While the Minnesota AG did file a lawsuit against separate solar-lending companies, Wolf River Electric was never a defendant."
       },
       {
         "type": "paragraph",
-        "snippet": "Instead, Wolf River Electric is the plaintiff. The company filed a defamation lawsuit against Google, seeking massive damages after the AI's incorrect summary led to canceled customer contracts and business losses."
+        "snippet": "Ironically, the situation is actually the reverse: Wolf River Electric is the one suing. The company filed a major defamation lawsuit against Google, seeking substantial damages over business losses caused by the AI's false summary."
       },
       {
         "type": "paragraph",
@@ -99,16 +102,12 @@
         "type": "list",
         "list": [
           {
-            "snippet": "The background of the defamation lawsuit against Google"
+            "snippet": "The defamation lawsuit against Google"
           },
           {
-            "snippet": "How AI Overview errors are handled legally"
+            "snippet": "The separate solar-lending lawsuit filed by the Minnesota Attorney General"
           }
         ]
-      },
-      {
-        "type": "paragraph",
-        "snippet": "Let me know what else you'd like to explore!"
       }
     ],
     "references": [
@@ -122,15 +121,23 @@
         "index": 0
       },
       {
-        "title": "An AI Defamed a Solar Company. Google Says It’s Not Responsible. | by Purdy House Publishing | Apr, 2026 | Medium",
+        "title": "An AI Defamed a Solar Company. Google Says It's Not ...",
         "link": "https://medium.com",
-        "snippet": "Wolf River Electric is a solar installation company based in Isanti, Minnesota. The company was not sued by the Minnesota Attorney General. However, Google's AI Ov...",
+        "snippet": "Purdy House Publishing 5 min read Apr 18, 2026 Press enter or click to view image in full size Image Credit: DallE Wolf River Electric is a solar installation comp...",
         "source": "Medium",
         "thumbnail": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR5NdByoVgkSHQzVz8JmuwGxoBznPajD9oSN_LrMHEiyGyiEB89zGh1dBJlo8T5jItBRWHdBqcDo5Wbn_SJ9nwu7M5UjAUtnJwVlXju",
         "source_icon": "https://encrypted-tbn2.gstatic.com/faviconV2?url=https://medium.com&client=AIM&size=128&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
         "index": 1
+      },
+      {
+        "title": "Dean William McGeveran Quoted in Star Tribune About Lawsuit Regarding AI False Statement | University of Minnesota Law School",
+        "link": "https://law.umn.edu",
+        "snippet": "Wolf River Electric, an Isanti-based company, filed a lawsuit against Google in March in state court. The lawsuit claims that Google's \\\"AI Overview\\\" falsely stated...",
+        "source": "Minnesota Law School",
+        "source_icon": "https://encrypted-tbn3.gstatic.com/faviconV2?url=https://law.umn.edu&client=AIM&size=128&type=FAVICON&fallback_opts=TYPE,SIZE,URL",
+        "index": 2
       }
     ],
-    "reconstructed_markdown": "No, Wolf River Electric is not the one being sued.\n\nThe confusion stems from a prominent error made by Google's \"AI Overview\" feature, which falsely claimed that the Isanti, Minnesota\\-based solar installation company was facing a lawsuit from the Minnesota Attorney General. While the Minnesota Attorney General did file a lawsuit against several separate solar\\-lending companies regarding hidden fees, Wolf River Electric was never a defendant in that case.\n\nInstead, Wolf River Electric is the plaintiff. The company filed a defamation lawsuit against Google, seeking massive damages after the AI's incorrect summary led to canceled customer contracts and business losses.\n\nIf you'd like, I can provide more details on:\n\n- The background of the defamation lawsuit against Google\n- How AI Overview errors are handled legally\n\nLet me know what else you'd like to explore\\!\n\n\n### References\n\n[0] [Minnesota Solar Company Sues Google Over AI Summary](https://www.govtech.com/) — June 13, 2025 • Emmy Martin, Star Tribune Shutterstock \\(TNS\\) — A Minnesota solar company is suing Google for defamation, claiming the tech company's “AI Overview” ...\n\n[1] [An AI Defamed a Solar Company. Google Says It’s Not Responsible. \\| by Purdy House Publishing \\| Apr, 2026 \\| Medium](https://medium.com/) — Wolf River Electric is a solar installation company based in Isanti, Minnesota. The company was not sued by the Minnesota Attorney General. However, Google's AI Ov...\n"
+    "reconstructed_markdown": "No, Wolf River Electric is not being sued by the Minnesota Attorney General, nor are they a defendant in that state lawsuit.\n\nThe confusion stems from a prominent error made by Google's \"AI Overview\" feature, which incorrectly claimed that the Isanti, Minnesota\\-based solar company was facing a deceptive sales practices lawsuit from the Minnesota Attorney General. While the Minnesota AG did file a lawsuit against separate solar\\-lending companies, Wolf River Electric was never a defendant.\n\nIronically, the situation is actually the reverse: Wolf River Electric is the one suing. The company filed a major defamation lawsuit against Google, seeking substantial damages over business losses caused by the AI's false summary.\n\nIf you'd like, I can provide more details on:\n\n- The defamation lawsuit against Google\n- The separate solar\\-lending lawsuit filed by the Minnesota Attorney General\n\n\n### References\n\n[0] [Minnesota Solar Company Sues Google Over AI Summary](https://www.govtech.com/) — June 13, 2025 • Emmy Martin, Star Tribune Shutterstock \\(TNS\\) — A Minnesota solar company is suing Google for defamation, claiming the tech company's “AI Overview” ...\n\n[1] [An AI Defamed a Solar Company. Google Says It's Not ...](https://medium.com/) — Purdy House Publishing 5 min read Apr 18, 2026 Press enter or click to view image in full size Image Credit: DallE Wolf River Electric is a solar installation comp...\n\n[2] [Dean William McGeveran Quoted in Star Tribune About Lawsuit Regarding AI False Statement \\| University of Minnesota Law School](https://law.umn.edu/) — Wolf River Electric, an Isanti\\-based company, filed a lawsuit against Google in March in state court. The lawsuit claims that Google's \\\"AI Overview\\\" falsely stated...\n"
   }
 }
