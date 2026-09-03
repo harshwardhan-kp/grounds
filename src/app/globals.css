@@ -1,126 +1,116 @@
 @import "tailwindcss";
 
 /*
- * GROUNDS design system.
- * Owned by the supervisor. Workers style THROUGH these tokens and must never
- * hardcode a colour, or the dark theme silently breaks.
+ * GROUNDS design system — technical-blueprint editorial.
  *
- * Direction: forensic, not analytics. Cool paper ground, ink-blue structure,
- * oxblood reserved strictly for defects. Serif for quoted machine text so it
- * reads as testimony; mono for every piece of metadata.
+ * Owned by the supervisor. Components style THROUGH these tokens and must never
+ * hardcode a colour.
+ *
+ * Direction: a flat warm-grey ground, near-black ink, and exactly one red. Labels
+ * are bracketed lowercase mono, the way an engineering drawing annotates a part.
+ * Display type is a high-contrast serif, used large and rarely.
+ *
+ * Red is reserved. It marks defects and nothing else, so a page carrying no red
+ * is telling the reader something true at a glance.
  */
 
 :root {
-  /* surfaces */
-  --ground: #eef0f3;
-  --surface: #ffffff;
-  --surface-2: #f5f6f8;
-  --surface-3: #e9ecef;
+  /* The greys are translucent ink rather than separate hues, so every surface
+     sits on one continuous field instead of stacking as cards. */
+  --ground: #eeeeee;
+  --surface: #f6f6f6;
+  --surface-2: rgba(106, 106, 106, 0.07);
+  --surface-3: rgba(106, 106, 106, 0.12);
 
-  /* text */
-  --ink: #11161d;
-  --muted: #5a6570;
-  --faint: #8a939d;
+  --ink: #000000;
+  --muted: #6a6a6a;
+  --faint: #9a9a9a;
 
-  /* lines */
-  --rule: #d5dae0;
-  --rule-strong: #b6bfc8;
+  --rule: rgba(106, 106, 106, 0.28);
+  --rule-strong: rgba(106, 106, 106, 0.5);
 
-  /* structure accent — links, focus, active state */
-  --accent: #16496b;
-  --accent-hover: #1d5c86;
-  --accent-soft: #e3ecf3;
-  --accent-ink: #ffffff;
+  --red: #e10909;
+  --red-soft: rgba(225, 9, 9, 0.08);
+  --red-rule: rgba(225, 9, 9, 0.45);
 
-  /* semantic verdict colours — deliberately separate from the accent hue */
-  --ok: #2a6048;
-  --ok-soft: #e2efe8;
-  --warn: #8a5d14;
-  --warn-soft: #f6eddc;
-  --critical: #8e2434;
-  --critical-soft: #f5e4e6;
-  --neutral: #5a6570;
-  --neutral-soft: #eceff2;
-
-  /* type */
-  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua",
-    Georgia, serif;
-  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-
-  --radius: 4px;
+  --on-ink: #eeeeee;
+  --radius: 3px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --ground: #0e1218;
-    --surface: #151a21;
-    --surface-2: #1b212a;
-    --surface-3: #232a33;
-    --ink: #dce2e9;
-    --muted: #909ba7;
-    --faint: #6c7682;
-    --rule: #262e38;
-    --rule-strong: #3a444e;
-    --accent: #7fb2de;
-    --accent-hover: #9cc6ea;
-    --accent-soft: #16232f;
-    --accent-ink: #0e1218;
-    --ok: #71c199;
-    --ok-soft: #16261f;
-    --warn: #d3a458;
-    --warn-soft: #2a2318;
-    --critical: #e28194;
-    --critical-soft: #2c1a1e;
-    --neutral: #909ba7;
-    --neutral-soft: #1f262f;
+    --ground: #0d0d0d;
+    --surface: #151515;
+    --surface-2: rgba(180, 180, 180, 0.07);
+    --surface-3: rgba(180, 180, 180, 0.12);
+    --ink: #ededed;
+    --muted: #9a9a9a;
+    --faint: #6a6a6a;
+    --rule: rgba(180, 180, 180, 0.24);
+    --rule-strong: rgba(180, 180, 180, 0.42);
+    --red: #ff4a44;
+    --red-soft: rgba(255, 74, 68, 0.12);
+    --red-rule: rgba(255, 74, 68, 0.5);
+    --on-ink: #0d0d0d;
   }
 }
 
 :root[data-theme="dark"] {
-  --ground: #0e1218;
-  --surface: #151a21;
-  --surface-2: #1b212a;
-  --surface-3: #232a33;
-  --ink: #dce2e9;
-  --muted: #909ba7;
-  --faint: #6c7682;
-  --rule: #262e38;
-  --rule-strong: #3a444e;
-  --accent: #7fb2de;
-  --accent-hover: #9cc6ea;
-  --accent-soft: #16232f;
-  --accent-ink: #0e1218;
-  --ok: #71c199;
-  --ok-soft: #16261f;
-  --warn: #d3a458;
-  --warn-soft: #2a2318;
-  --critical: #e28194;
-  --critical-soft: #2c1a1e;
-  --neutral: #909ba7;
-  --neutral-soft: #1f262f;
+  --ground: #0d0d0d;
+  --surface: #151515;
+  --surface-2: rgba(180, 180, 180, 0.07);
+  --surface-3: rgba(180, 180, 180, 0.12);
+  --ink: #ededed;
+  --muted: #9a9a9a;
+  --faint: #6a6a6a;
+  --rule: rgba(180, 180, 180, 0.24);
+  --rule-strong: rgba(180, 180, 180, 0.42);
+  --red: #ff4a44;
+  --red-soft: rgba(255, 74, 68, 0.12);
+  --red-rule: rgba(255, 74, 68, 0.5);
+  --on-ink: #0d0d0d;
 }
 
-/* Expose tokens to Tailwind utilities: bg-surface, text-muted, border-rule … */
+
+/* ------------------------------------------------------------------ *
+ * Back-compatibility aliases.
+ *
+ * The palette collapsed from four semantic hues to ink + one red. Components
+ * not yet restyled still ask for the old names, so they are mapped here rather
+ * than left undefined, which would render as transparent. The mapping preserves
+ * MEANING: anything that was critical becomes red, everything else becomes ink
+ * or faint. Nothing smuggles a second accent back in.
+ * ------------------------------------------------------------------ */
+:root, :root[data-theme="dark"] {
+  --ok: var(--ink);
+  --ok-soft: var(--surface-2);
+  --warn: var(--ink);
+  --warn-soft: var(--surface-2);
+  --critical: var(--red);
+  --critical-soft: var(--red-soft);
+  --neutral: var(--faint);
+  --neutral-soft: var(--surface-2);
+  --accent: var(--ink);
+  --accent-hover: var(--red);
+  --accent-soft: var(--surface-2);
+  --accent-ink: var(--on-ink);
+}
+
 @theme inline {
   --color-ground: var(--ground);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
   --color-ink: var(--ink);
-  /* Alias. Components written against `text-foreground` were silently resolving
-     to nothing and inheriting body colour, which happened to look right; this
-     makes the intent real so the utility works in every context. */
-  --color-foreground: var(--ink);
   --color-muted: var(--muted);
   --color-faint: var(--faint);
   --color-rule: var(--rule);
   --color-rule-strong: var(--rule-strong);
-  --color-accent: var(--accent);
-  --color-accent-hover: var(--accent-hover);
-  --color-accent-soft: var(--accent-soft);
-  --color-accent-ink: var(--accent-ink);
+  --color-red: var(--red);
+  --color-red-soft: var(--red-soft);
+  --color-red-rule: var(--red-rule);
+  --color-on-ink: var(--on-ink);
+
   --color-ok: var(--ok);
   --color-ok-soft: var(--ok-soft);
   --color-warn: var(--warn);
@@ -129,10 +119,14 @@
   --color-critical-soft: var(--critical-soft);
   --color-neutral: var(--neutral);
   --color-neutral-soft: var(--neutral-soft);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
 
-  --font-serif: var(--font-serif);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
+  --font-display: var(--font-instrument-serif), "Times New Roman", serif;
+  --font-sans: var(--font-schibsted), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
 }
 
 * {
@@ -141,79 +135,95 @@
 
 html,
 body {
-  padding: 0;
   margin: 0;
-}
-
-/* The viewer paints its own ground behind the page; html must carry the token
-   too or short pages show a band of the host background below the content. */
-html {
+  padding: 0;
   background: var(--ground);
-  min-height: 100%;
 }
 
 body {
-  background: var(--ground);
   color: var(--ink);
-  font-family: var(--font-sans);
-  font-size: 15px;
-  line-height: 1.55;
+  font-family: var(--font-schibsted), ui-sans-serif, system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Metadata voice — search ids, hashes, params, latencies. */
+/* The bracket label — the signature device. Every piece of metadata is
+   annotated the way an engineering drawing annotates a part. */
+.bracket {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.bracket::before { content: "["; }
+.bracket::after { content: "]"; }
+
+/* Unbracketed mono, for hashes and ids that a reader may need to copy. */
+.mono {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  color: var(--muted);
+}
+
+/* Kept for compatibility with existing markup; same voice as .mono. */
 .meta {
-  font-family: var(--font-mono);
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 10.5px;
-  letter-spacing: 0.11em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
-/* Quoted machine text reads as testimony, not as UI copy. */
+.display {
+  font-family: var(--font-instrument-serif), "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+/* What the AI actually said. Serif, so it reads as testimony rather than
+   as interface copy. */
 .testimony {
-  font-family: var(--font-serif);
-  font-size: 1.02rem;
-  line-height: 1.6;
+  font-family: var(--font-instrument-serif), "Times New Roman", serif;
+  font-size: 1.2rem;
+  line-height: 1.4;
 }
 
-/* Digits that line up in columns. */
-.tabular {
-  font-variant-numeric: tabular-nums;
-}
+.tabular { font-variant-numeric: tabular-nums; }
 
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 2px;
+/* A small square marker: the anchor end of an annotation. */
+.marker {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--red);
+  vertical-align: middle;
 }
+.marker-ink { background: var(--ink); }
+
+/* The dotted leader running from an annotation to what it annotates. */
+.leader { border-bottom: 1px dashed var(--rule-strong); }
+
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--red); }
+
+:focus-visible { outline: 1px solid var(--red); outline-offset: 3px; }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }
 
-/* Wide content scrolls inside its own container, never the page body. */
-.scroll-x {
-  overflow-x: auto;
-  max-width: 100%;
-}
+.scroll-x { overflow-x: auto; max-width: 100%; }
 
-/* ---------------------------------------------------------------------------
- * Print — a dossier is a document before it is a page.
- *
- * A reviewer, a client or an adviser will want this on paper or as a PDF, and
- * the on-screen theme is the wrong starting point for that: a dark dossier
- * prints as a black slab. The tokens are redefined to the light palette here
- * rather than in any component, so the rule that colour lives only in this file
- * still holds. print-color-adjust keeps verdict chips and distribution bars
- * filled — they carry meaning, so dropping them would change the document.
- * ------------------------------------------------------------------------ */
 @media print {
   :root,
   :root[data-theme="dark"] {

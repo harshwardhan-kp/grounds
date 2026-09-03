@@ -1,15 +1,5 @@
 import type { Reference, SourceStance, Verdict } from "@/lib/types";
-
-const VERDICT_STYLES: Record<Verdict, string> = {
-  GROUNDED: "bg-ok-soft text-ok border-ok",
-  MISCITED: "bg-warn-soft text-warn border-warn",
-  STALE: "bg-warn-soft text-warn border-warn",
-  CONFLATED: "bg-warn-soft text-warn border-warn",
-  UNVERIFIABLE: "bg-warn-soft text-warn border-warn",
-  UNSOURCED: "bg-critical-soft text-critical border-critical",
-  CONTRADICTED: "bg-critical-soft text-critical border-critical",
-  OPINION: "bg-neutral-soft text-neutral border-neutral",
-};
+import { Bracket, Marker } from "@/components/ui";
 
 function extractDomain(link: string, fallbackSource: string | null): string {
   try {
@@ -27,15 +17,28 @@ export function VerdictChip({
   verdict: Verdict;
   size?: "sm" | "md";
 }) {
-  const colorClasses = VERDICT_STYLES[verdict];
-  const sizeClasses =
-    size === "sm" ? "text-[10px] px-1.5 py-0.5" : "text-xs px-2 py-0.5";
+  const hasMarker =
+    verdict === "UNSOURCED" ||
+    verdict === "CONTRADICTED" ||
+    verdict === "MISCITED" ||
+    verdict === "STALE" ||
+    verdict === "CONFLATED";
+
+  const textColor =
+    verdict === "UNSOURCED" || verdict === "CONTRADICTED"
+      ? "text-red"
+      : verdict === "UNVERIFIABLE" || verdict === "OPINION"
+        ? "text-faint"
+        : "text-ink";
+
+  const sizeClass = size === "sm" ? "text-xs" : "text-sm";
 
   return (
-    <span
-      className={`inline-flex items-center font-mono uppercase tracking-wide border rounded-[3px] font-medium leading-none ${sizeClasses} ${colorClasses}`}
-    >
-      {verdict}
+    <span className={`inline-flex items-center gap-1.5 ${sizeClass}`}>
+      {hasMarker && <Marker tone="red" />}
+      <span className={`bracket ${textColor}`}>
+        {verdict.toLowerCase()}
+      </span>
     </span>
   );
 }
@@ -51,44 +54,48 @@ export function SourceStanceRow({
 }) {
   const domain = extractDomain(reference.link, reference.source);
 
-  const titleClasses =
+  const titleClass =
     stance === "silent"
-      ? "line-through text-muted"
+      ? "line-through text-faint"
       : stance === "opaque"
-        ? "text-muted"
-        : "text-foreground";
+        ? "text-faint"
+        : "text-ink";
 
   return (
-    <div className="flex flex-col gap-1.5 text-sm">
-      <div className="flex items-baseline gap-2 flex-wrap">
-        {reference.link ? (
-          <a
-            href={reference.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`hover:underline font-medium ${titleClasses}`}
-          >
-            {reference.title}
-          </a>
-        ) : (
-          <span className={`font-medium ${titleClasses}`}>
-            {reference.title}
-          </span>
-        )}
-        {domain && <span className="meta text-xs text-muted">{domain}</span>}
-        {stance === "opaque" && (
-          <span className="meta text-xs text-muted italic">could not read</span>
-        )}
+    <div className="flex flex-col gap-2 py-3 border-b border-rule last:border-b-0 first:pt-0 last:pb-0">
+      <div className="flex flex-col gap-0.5">
+        <div className="flex items-baseline gap-2 flex-wrap">
+          {reference.link ? (
+            <a
+              href={reference.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`hover:underline text-sm ${titleClass}`}
+            >
+              {reference.title}
+            </a>
+          ) : (
+            <span className={`text-sm ${titleClass}`}>
+              {reference.title}
+            </span>
+          )}
+          {stance === "opaque" && (
+            <span className="bracket text-faint text-xs">could not read</span>
+          )}
+        </div>
+        {domain ? (
+          <span className="mono text-xs text-muted">{domain}</span>
+        ) : null}
       </div>
 
       {evidenceQuote && stance === "supports" && (
-        <blockquote className="testimony text-sm text-foreground pl-3 border-l-2 border-rule">
+        <blockquote className="testimony text-sm text-ink pl-3 border-l border-rule">
           {evidenceQuote}
         </blockquote>
       )}
 
       {evidenceQuote && stance === "contradicts" && (
-        <blockquote className="testimony text-sm text-critical pl-3 border-l-2 border-critical">
+        <blockquote className="testimony text-sm text-red pl-3 border-l border-red-rule">
           {evidenceQuote}
         </blockquote>
       )}
@@ -112,23 +119,21 @@ export function EvidencePanel({
   corroborationNote?: string | null;
 }) {
   return (
-    <div className="bg-surface border border-rule rounded p-5 sm:p-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div className="flex flex-col gap-3 items-start">
-          <div className="meta text-xs uppercase tracking-wide text-muted">
-            What the AI said
-          </div>
-          <p className="testimony text-base leading-relaxed text-foreground">
+    <div className="bg-surface p-6">
+      <div className="grid grid-cols-1 min-[720px]:grid-cols-2">
+        <div className="flex flex-col gap-4 items-start pb-6 min-[720px]:pb-0 min-[720px]:pr-8 border-b min-[720px]:border-b-0 min-[720px]:border-r border-rule">
+          <Bracket tone="muted">what the AI said</Bracket>
+          <p className="testimony text-lg min-[720px]:text-xl leading-relaxed text-ink">
             {claimText}
           </p>
-          <VerdictChip verdict={verdict} />
+          <div className="mt-auto pt-2">
+            <VerdictChip verdict={verdict} />
+          </div>
         </div>
 
-        <div className="flex flex-col gap-3">
-          <div className="meta text-xs uppercase tracking-wide text-muted">
-            What its cited sources say
-          </div>
-          <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4 pt-6 min-[720px]:pt-0 min-[720px]:pl-8">
+          <Bracket tone="muted">what its cited sources say</Bracket>
+          <div className="flex flex-col">
             {sources.map((source, idx) => (
               <SourceStanceRow
                 key={
@@ -160,17 +165,21 @@ export function ScoreDial({
   score: number;
   label: string;
 }) {
-  const scoreColor =
-    score >= 80 ? "text-ok" : score >= 55 ? "text-warn" : "text-critical";
+  const isCritical = score < 55;
+  const isWarning = score >= 55 && score < 80;
+  const scoreColor = isCritical ? "text-red" : "text-ink";
 
   return (
-    <div className="flex flex-col gap-1">
-      <div
-        className={`tabular text-3xl sm:text-4xl font-semibold leading-none ${scoreColor}`}
-      >
-        {score}
+    <div className="flex flex-col gap-1 items-start">
+      <div className="flex items-center gap-2">
+        <span
+          className={`display tabular text-4xl sm:text-5xl leading-none ${scoreColor}`}
+        >
+          {score}
+        </span>
+        {isWarning && <Marker tone="red" />}
       </div>
-      <div className="meta text-xs text-muted">{label}</div>
+      <Bracket tone="muted">{label.toLowerCase()}</Bracket>
     </div>
   );
 }

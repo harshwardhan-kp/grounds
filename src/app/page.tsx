@@ -1,193 +1,263 @@
 import Link from "next/link";
-import { VerdictChip } from "@/components/Verdict";
 import type { Verdict } from "@/lib/types";
+import {
+  Bracket,
+  Rule,
+  SectionHead,
+  PillButton,
+  Annotation,
+  Wordmark,
+} from "@/components/ui";
+import { VerdictChip } from "@/components/Verdict";
 
-interface VerdictExplanation {
-  verdict: Verdict;
+interface Stage {
+  name: string;
   description: string;
 }
 
-const VERDICT_EXPLANATIONS: VerdictExplanation[] = [
+const STAGES: Stage[] = [
+  {
+    name: "docketing",
+    description:
+      "Target entity is registered, aliases and collision-set neighbours are indexed, and the search budget is established.",
+  },
+  {
+    name: "line of questioning",
+    description:
+      "Deterministic probe families are compiled across identity, adverse, commercial, qualification, and operational queries.",
+  },
+  {
+    name: "deposition",
+    description:
+      "Probes are dispatched across a geographic locale grid, capturing append-only raw engine observations and suppression records.",
+  },
+  {
+    name: "claim decomposition",
+    description:
+      "Generative answers are parsed into atomic factual assertions mapped to their containing block text and cited reference indices.",
+  },
+  {
+    name: "cross-examination",
+    description:
+      "Every atomic assertion is tested against the union of its block citations via SerpApi snippet evaluation and verified page retrieval.",
+  },
+  {
+    name: "divergence and scoring",
+    description:
+      "Observed assertions are clustered across locales and engines to compute attribution integrity, consistency, and overall grounds scores.",
+  },
+];
+
+interface VerdictDefinition {
+  verdict: Verdict;
+  meaning: string;
+}
+
+const VERDICTS: VerdictDefinition[] = [
   {
     verdict: "GROUNDED",
-    description: "Cited sources support the claim and independent corroboration checks out.",
+    meaning:
+      "Cited sources support the claim and independent corroboration checks out.",
   },
   {
     verdict: "MISCITED",
-    description: "True, but the cited sources do not contain or support the claim.",
+    meaning:
+      "The claim may be true, but the sources Google cited do not contain it.",
   },
   {
     verdict: "UNSOURCED",
-    description: "Cited sources are silent and no independent corroboration was found.",
+    meaning:
+      "Cited sources are silent on the claim and no independent corroboration exists.",
   },
   {
     verdict: "CONTRADICTED",
-    description: "Independent authoritative sources directly refute the assertion.",
+    meaning:
+      "Independent corroborating sources directly refute the assertion.",
   },
   {
     verdict: "STALE",
-    description: "Was true previously, but a newer source refutes it.",
+    meaning:
+      "The assertion was previously true, but a newer authoritative source refutes it.",
   },
   {
     verdict: "CONFLATED",
-    description: "True of a different entity in the collision set, wrongly attributed to the target.",
+    meaning:
+      "The assertion is true of a different entity in the collision set.",
   },
   {
     verdict: "UNVERIFIABLE",
-    description:
-      "Cited sources could not be retrieved, paywalled, or parsed; never counted as a defect because an unreadable source must never become an accusation.",
+    meaning:
+      "Cited sources could not be read due to paywalls, blocks, or unparseable formats.",
   },
   {
     verdict: "OPINION",
-    description: "Subjective, evaluative, or predictive statements excluded from defect scoring.",
+    meaning:
+      "Subjective value judgement or prediction, excluded from scoring.",
   },
 ];
 
 export default function HomePage() {
   return (
-    <main className="mx-auto flex max-w-[900px] flex-col gap-12 px-6 py-16 sm:gap-16 sm:py-24">
-      {/* 1. WORDMARK */}
+    <div className="max-w-[1080px] mx-auto px-6 flex flex-col gap-20 py-8">
+      {/* 1. TOP BAR */}
       <header className="flex flex-col gap-4">
-        <div className="meta tracking-widest text-xs uppercase text-muted">
-          GROUNDS
+        <div className="flex items-center justify-between">
+          <Link
+            href="/"
+            className="mono lowercase text-sm text-ink hover:text-red active:text-red transition-colors"
+          >
+            grounds
+          </Link>
+          <nav className="flex items-center gap-4">
+            <Link
+              href="/depose"
+              className="group text-muted hover:text-red active:text-red transition-colors focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-1"
+            >
+              <Bracket className="group-hover:text-red group-active:text-red transition-colors">
+                deposition
+              </Bracket>
+            </Link>
+            <Link
+              href="/dossier/wolf-river"
+              className="group text-muted hover:text-red active:text-red transition-colors focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-1"
+            >
+              <Bracket className="group-hover:text-red group-active:text-red transition-colors">
+                recorded dossier
+              </Bracket>
+            </Link>
+          </nav>
         </div>
-
-        {/* 2. HEADLINE */}
-        <h1 className="font-serif text-[clamp(2rem,4.5vw,3.2rem)] font-normal leading-tight [text-wrap:balance]">
-          Every AI answer about you, cross-examined against its own sources.
-        </h1>
-
-        {/* 3. DECK */}
-        <p className="max-w-[60ch] text-base leading-relaxed text-muted">
-          Generative search now answers questions about companies directly, citing
-          sources alongside its assertions, but nobody checks whether those sources
-          actually support what the AI says. GROUNDS makes this gap measurable,
-          systematic, and forensically auditable.
-        </p>
+        <Rule />
       </header>
 
-      {/* 4. THE CASE */}
-      <section className="border border-rule border-l-2 border-l-critical bg-surface p-6 sm:p-8">
-        <div className="meta mb-3 text-xs uppercase tracking-wider text-muted">
-          THE CASE THAT MOTIVATES THIS
-        </div>
-        <p className="text-base leading-relaxed">
-          In 2025 an AI Overview told searchers a Minnesota solar installer was
-          being sued by the state Attorney General. It was not. The answer cited
-          four sources; none of them contained the claim. The company reported
-          losing a $150,000 contract and has brought a case against Google over
-          the answer; that litigation is ongoing.
+      {/* 2. HERO */}
+      <section className="flex flex-col gap-6">
+        <h1 className="display lowercase text-[clamp(2.2rem,6vw,4.2rem)] leading-[1.08] text-ink tracking-tight [text-wrap:balance] m-0">
+          every ai answer about you,{" "}
+          <span className="italic">cross-examined</span> against its own sources
+        </h1>
+        <p className="text-muted text-base sm:text-lg leading-relaxed max-w-[58ch] m-0">
+          generative search now answers questions about companies directly and cites
+          sources, and nobody checks whether those sources actually support what it says.
         </p>
-        <p className="mt-3 text-sm leading-relaxed text-muted">
-          Google has since corrected that answer — which is exactly why this has
-          to be measured continuously rather than once.
+        <div className="flex flex-wrap items-center gap-3 pt-2">
+          <PillButton href="/dossier/wolf-river" variant="primary">
+            open the recorded dossier
+          </PillButton>
+          <PillButton href="/depose" variant="secondary">
+            watch a deposition
+          </PillButton>
+        </div>
+        <p className="meta text-xs text-muted m-0">
+          <Bracket tone="muted">
+            recorded 2026-09-01 · 148 searches · 8 markets
+          </Bracket>
         </p>
       </section>
 
-      {/* 5. ACTION ROW */}
-      <section className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-4">
-          <Link
-            href="/dossier/wolf-river"
-            className="rounded bg-accent px-5 py-2.5 text-sm font-medium text-accent-ink no-underline transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-          >
-            Open the recorded dossier
-          </Link>
-          <Link
-            href="#method"
-            className="rounded border border-rule bg-surface px-5 py-2.5 text-sm font-medium no-underline transition-colors hover:border-rule-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-          >
-            How it works
-          </Link>
+      {/* 3. THE CASE */}
+      <section className="flex flex-col gap-6">
+        <SectionHead index="01" title="the case that started this" />
+        <div className="flex flex-col gap-3 max-w-[62ch]">
+          <p className="text-ink text-sm sm:text-base leading-relaxed m-0">
+            In 2025 a Google AI Overview told searchers a Minnesota solar installer was being
+            sued by the state Attorney General. It was not. The answer cited four sources and
+            none of them contained the claim. The company reported losing a $150,000 contract
+            and sued Google; that litigation is ongoing.
+          </p>
+          <p className="text-muted text-sm sm:text-base leading-relaxed m-0">
+            Google has since corrected that answer, which is the point — generative answers
+            change underneath you, so this has to be measured continuously rather than once.
+          </p>
         </div>
-        <div className="meta text-xs text-muted">
-          Recorded 2026-09-01 · 148 SerpApi searches · 8 markets
+        <div className="flex flex-col gap-3 max-w-[62ch]">
+          <Annotation label="cited">
+            four sources, formatted exactly like a grounded answer
+          </Annotation>
+          <Annotation label="contained">
+            none of them carried the claim
+          </Annotation>
+          <Annotation label="cost">
+            a $150,000 contract
+          </Annotation>
         </div>
       </section>
 
-      {/* 6. METHOD */}
-      <section id="method" className="flex flex-col gap-6 pt-4">
-        <h2 className="text-lg font-semibold tracking-tight">Method</h2>
-        <ol className="flex flex-col gap-4">
-          <li className="flex items-start gap-4">
-            <span className="tabular meta shrink-0 text-muted">01</span>
-            <p className="text-sm leading-relaxed">
-              <strong className="font-semibold text-foreground">Docketing</strong>
-              {" — "}
-              Establish the canonical entity card, domain, aliases, operating locations, and a collision set of confusingly-similar entities.
-            </p>
-          </li>
-          <li className="flex items-start gap-4">
-            <span className="tabular meta shrink-0 text-muted">02</span>
-            <p className="text-sm leading-relaxed">
-              <strong className="font-semibold text-foreground">Line of questioning</strong>
-              {" — "}
-              Compile a structured probe grid across identity, adverse, commercial, qualification, and operational query families.
-            </p>
-          </li>
-          <li className="flex items-start gap-4">
-            <span className="tabular meta shrink-0 text-muted">03</span>
-            <p className="text-sm leading-relaxed">
-              <strong className="font-semibold text-foreground">Deposition</strong>
-              {" — "}
-              Execute queries across multiple locales and engines, recording raw payloads in an immutable, append-only chain of custody.
-            </p>
-          </li>
-          <li className="flex items-start gap-4">
-            <span className="tabular meta shrink-0 text-muted">04</span>
-            <p className="text-sm leading-relaxed">
-              <strong className="font-semibold text-foreground">Claim decomposition</strong>
-              {" — "}
-              Segment generative responses into atomic subject-predicate-object assertions with character spans and containing block references.
-            </p>
-          </li>
-          <li className="flex items-start gap-4">
-            <span className="tabular meta shrink-0 text-muted">05</span>
-            <p className="text-sm leading-relaxed">
-              <strong className="font-semibold text-foreground">Cross-examination</strong>
-              {" — "}
-              Check claims against the union of cited block references via indexed snippets before fetching, followed by independent corroboration.
-            </p>
-          </li>
-          <li className="flex items-start gap-4">
-            <span className="tabular meta shrink-0 text-muted">06</span>
-            <p className="text-sm leading-relaxed">
-              <strong className="font-semibold text-foreground">Divergence and scoring</strong>
-              {" — "}
-              Cluster repeated assertions across markets, evaluate frequency and cross-locale inconsistencies, and produce composite grounds scores.
-            </p>
-          </li>
+      {/* 4. THE GAP */}
+      <section className="flex flex-col gap-4">
+        <SectionHead index="02" title="what nobody measures" />
+        <div className="flex flex-col gap-3 max-w-[62ch]">
+          <p className="text-ink text-sm sm:text-base leading-relaxed m-0">
+            There is a whole category of AI-visibility tools and they all measure the
+            same thing — is the brand mentioned, in which prompts, with what sentiment.
+          </p>
+          <p className="text-muted text-sm sm:text-base leading-relaxed m-0">
+            None of them check whether the sources cited beside a sentence actually
+            contain that sentence. The missing property is{" "}
+            <span className="text-red">attribution integrity</span>.
+          </p>
+        </div>
+      </section>
+
+      {/* 5. METHOD */}
+      <section className="flex flex-col gap-6">
+        <SectionHead index="03" title="how a deposition runs" />
+        <ol className="flex flex-col gap-6 list-none p-0 m-0">
+          {STAGES.map((stage, idx) => (
+            <li
+              key={stage.name}
+              className="grid grid-cols-1 min-[720px]:grid-cols-[200px_1fr] items-baseline gap-2 min-[720px]:gap-6"
+            >
+              <div className="flex items-baseline gap-2.5">
+                <span className="tabular mono text-muted text-xs">
+                  {String(idx + 1).padStart(2, "0")}
+                </span>
+                <Bracket tone="ink">{stage.name}</Bracket>
+              </div>
+              <p className="text-muted text-sm leading-relaxed m-0">
+                {stage.description}
+              </p>
+            </li>
+          ))}
         </ol>
       </section>
 
-      {/* 7. VERDICT KEY */}
-      <section className="flex flex-col gap-6 pt-4">
-        <h2 className="text-lg font-semibold tracking-tight">Verdict taxonomy</h2>
-        <div className="scroll-x">
-          <dl className="flex min-w-[600px] flex-col divide-y divide-rule border-y border-rule">
-            {VERDICT_EXPLANATIONS.map(({ verdict, description }) => (
-              <div
-                key={verdict}
-                className="flex items-baseline gap-6 py-3"
-              >
-                <dt className="w-36 shrink-0">
-                  <VerdictChip verdict={verdict} />
-                </dt>
-                <dd className="text-sm leading-relaxed text-muted">
-                  {description}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div>
+      {/* 6. VERDICTS */}
+      <section className="flex flex-col gap-6">
+        <SectionHead index="04" title="the eight verdicts" />
+        <dl className="flex flex-col gap-4 m-0 p-0">
+          {VERDICTS.map(({ verdict, meaning }) => (
+            <div
+              key={verdict}
+              className="grid grid-cols-1 min-[720px]:grid-cols-[180px_1fr] items-baseline gap-2 min-[720px]:gap-6"
+            >
+              <dt className="m-0">
+                <VerdictChip verdict={verdict} />
+              </dt>
+              <dd className="text-muted text-sm leading-relaxed m-0">
+                {meaning}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        <p className="text-muted text-sm leading-relaxed pt-4 border-t border-rule m-0">
+          <span className="mono text-ink">UNVERIFIABLE</span> is never counted as a
+          defect, because an unreadable source must never become an accusation.
+        </p>
       </section>
 
-      {/* 8. FOOTER */}
-      <footer className="border-t border-rule pt-8">
-        <p className="meta text-xs text-muted">
-          GROUNDS reports observations, not legal conclusions.
+      {/* 7. FOOT */}
+      <footer className="flex flex-col gap-8 pb-16">
+        <Rule />
+        <p className="meta text-xs text-muted m-0">
+          <Bracket tone="muted">
+            grounds reports observations, not legal conclusions
+          </Bracket>
         </p>
+        <div className="w-full overflow-hidden">
+          <Wordmark text="grounds" />
+        </div>
       </footer>
-    </main>
+    </div>
   );
 }
