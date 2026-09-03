@@ -303,7 +303,8 @@ Return JSON:
           q: query,
         });
 
-        const res = rawRes as SerpSearchResult;
+        const env = rawRes as { data: unknown; searchId: string | null };
+        const res = env.data as SerpSearchResult;
         if (res.search_metadata?.id) {
           searchIds.push(res.search_metadata.id);
         }
@@ -400,19 +401,28 @@ export async function corroborate(opts: {
       q: query,
     });
   } catch {
+    /*
+     * A search that ERRORED is not a search that found nothing. Returning
+     * "absent" here would let a network failure push a claim toward UNSOURCED —
+     * the precise false-accusation this system exists to avoid. "inconclusive"
+     * carries no defect weight and lands the claim on UNVERIFIABLE instead.
+     */
     return {
       claimId: opts.claim.id,
-      outcome: "absent",
+      outcome: "inconclusive",
       enginesUsed,
       searchIds,
       evidenceQuote: null,
-      reasoning: "no support found in the cited sources or independent search",
+      reasoning:
+        "The independent corroboration search could not be completed, so nothing was established either way.",
     };
   }
 
-  const res = rawRes as SerpSearchResult;
-  if (res.search_metadata?.id) {
-    searchIds.push(res.search_metadata.id);
+  const env = rawRes as { data: unknown; searchId: string | null };
+  const res = env.data as SerpSearchResult;
+  const corrId = env.searchId ?? res.search_metadata?.id ?? null;
+  if (corrId) {
+    searchIds.push(corrId);
   }
 
   // Gather evidentiary snippets returned by the engine
@@ -488,13 +498,20 @@ Return JSON:
         "Independent corroboration assessment complete.",
     };
   } catch {
+    /*
+     * A search that ERRORED is not a search that found nothing. Returning
+     * "absent" here would let a network failure push a claim toward UNSOURCED —
+     * the precise false-accusation this system exists to avoid. "inconclusive"
+     * carries no defect weight and lands the claim on UNVERIFIABLE instead.
+     */
     return {
       claimId: opts.claim.id,
-      outcome: "absent",
+      outcome: "inconclusive",
       enginesUsed,
       searchIds,
       evidenceQuote: null,
-      reasoning: "no support found in the cited sources or independent search",
+      reasoning:
+        "The independent corroboration search could not be completed, so nothing was established either way.",
     };
   }
 }
