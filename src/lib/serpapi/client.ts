@@ -532,3 +532,17 @@ export async function serp<T = unknown>(
 export function isSerpApiConfigured(): boolean {
   return typeof process.env.SERPAPI_KEY === "string" && process.env.SERPAPI_KEY.length > 0;
 }
+
+/**
+ * Whether this deployment may spend search quota on NEW searches.
+ *
+ * Deliberately separate from key presence. Retrieving an archived search costs
+ * nothing — measured against the account: 220 searches remaining before and
+ * after — so the public demo can carry a key and let anyone re-verify a finding
+ * against SerpApi's own record, while still refusing to run live audits.
+ *
+ * Live auditing therefore requires an explicit opt-in, not merely a key.
+ */
+export function isLiveAuditEnabled(): boolean {
+  return isSerpApiConfigured() && process.env.GROUNDS_LIVE_AUDIT === "on";
+}

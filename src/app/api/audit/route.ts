@@ -1,5 +1,5 @@
 import { checkRateLimit, clientKeyFrom, recordRun } from "@/lib/judge-mode";
-import { isSerpApiConfigured } from "@/lib/serpapi/client";
+import { isLiveAuditEnabled } from "@/lib/serpapi/client";
 import { depose, DEFAULT_LOCALES, parseAiOverview } from "@/lib/engine/deposition";
 import { decomposeClaims, crossExamineMany } from "@/lib/engine/crossexam";
 import { BudgetLedger, BudgetExceededError } from "@/lib/serpapi/client";
@@ -76,11 +76,11 @@ export async function POST(req: Request): Promise<Response> {
    * the monthly quota. Say so plainly and point at the recorded dossier rather
    * than letting a missing-key error surface part-way through the stream.
    */
-  if (!isSerpApiConfigured()) {
+  if (!isLiveAuditEnabled()) {
     return Response.json(
       {
         error:
-          "Live audits are turned off on this deployment, so it cannot spend search quota. The recorded dossier shows the full pipeline output, and its archive verification still works.",
+          "Live audits are turned off on this deployment, so it cannot spend search quota. Watch a replay of a real recorded audit instead, or open the recorded dossier — its archive verification is live and re-checks against SerpApi.",
         recordedDossierUrl: "/dossier/wolf-river",
         liveDisabled: true,
       },
